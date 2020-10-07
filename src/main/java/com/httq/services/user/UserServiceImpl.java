@@ -1,8 +1,12 @@
 package com.httq.services.user;
 
 import com.httq.config.JwtTokenProvider;
+import com.httq.dto.user.UserResponseDTO;
 import com.httq.exception.CustomException;
+import com.httq.model.Role;
 import com.httq.model.User;
+import com.httq.model.UserInfo;
+import com.httq.repository.UserInfoRepository;
 import com.httq.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -22,6 +27,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UsersRepository userRepository;
+
+	@Autowired
+	private UserInfoRepository userInfoRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -89,7 +97,7 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	public String signin(String email, String password) {
+	public String signin(String email, String password) throws CustomException {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 			Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -102,19 +110,23 @@ public class UserServiceImpl implements UserService {
 		throw new CustomException("Invalid email/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-	public String signup(User user) {
+	public String signup(User user) throws CustomException {
 		if (!userRepository.existsByEmail(user.getEmail())) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+			user.setRoles(Collections.singletonList(Role.ROLE_USER));
+
+			user.setEnabled(true);
+			user.setAccountNonLocked(true);
+			user.setAccountNonExpired(true);
+			user.setCredentialsNonExpired(true);
+
 			userRepository.save(user);
 			return jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
 		} else {
 			throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
-
-//	public void delete(String email) {
-//		userRepository.deleteByUsername(email);
-//	}
 
 	public User search(String email) {
 		Optional<User> user = userRepository.findByEmail(email);
@@ -124,11 +136,36 @@ public class UserServiceImpl implements UserService {
 		return user.get();
 	}
 
-	public User whoami(HttpServletRequest req) {
-		return userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req))).get();
+	public UserResponseDTO getInfo(User user) {
+		UserResponseDTO userResponse = new UserResponseDTO();
+		userResponse.setId(user.getId());
+		userResponse.setEmail(user.getEmail());
+		userResponse.setRoles(user.getRoles());
+
+		Optional<UserInfo> optionalUserInfo = userInfoRepository.findByUser(user);
+		if (optionalUserInfo.isPresent()) {
+			UserInfo userInfo = optionalUserInfo.get();
+			userResponse.setLastName(userInfo.getLastName());
+			userResponse.setFirstName(userInfo.getFirstName());
+			userResponse.setAddress(userInfo.getAddress());
+			userResponse.setPhone(userInfo.getPhone());
+		}
+		return userResponse;
 	}
 
-	public String refresh(String email) {
+	public UserResponseDTO myInfo(HttpServletRequest req) {
+		User user = userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)))
+		                          .get();
+		return this.getInfo(user);
+	}
+
+	public UserResponseDTO getInfoById(Long id) {
+		Optional<User> optionalUser = userRepository.findById(id);
+		return optionalUser.map(this::getInfo)
+		                   .orElse(null);
+	}
+
+	public String refresh(String email) throws CustomException {
 		Optional<User> optionalUser = userRepository.findByEmail(email);
 		if (optionalUser.isPresent()) {
 			User user = optionalUser.get();

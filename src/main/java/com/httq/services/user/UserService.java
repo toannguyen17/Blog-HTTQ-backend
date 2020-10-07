@@ -1,5 +1,7 @@
 package com.httq.services.user;
 
+import com.httq.dto.user.UserResponseDTO;
+import com.httq.exception.CustomException;
 import com.httq.model.User;
 import com.httq.services.IGeneralService;
 import org.springframework.security.authentication.LockedException;
@@ -11,9 +13,12 @@ public interface UserService extends IGeneralService<User> {
 	void resetFailAttempts(String email);
 	void updateFailAttempts(String email) throws LockedException;
 
-	String signin(String email, String password);
-	String signup(User user);
+	String signin(String email, String password) throws CustomException;
+	String signup(User user) throws CustomException;
 	User search(String email);
-	User whoami(HttpServletRequest req);
-	String refresh(String email);
+
+	UserResponseDTO getInfoById(Long id);
+
+	UserResponseDTO myInfo(HttpServletRequest req);
+	String refresh(String email) throws CustomException;
 }

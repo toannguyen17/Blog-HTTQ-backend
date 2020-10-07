@@ -33,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	@Qualifier("userDetailsService")
-	public UserDetailsService userDetailsService(){
+	public UserDetailsService userDetailsService() {
 		return new UserDetailsServiceImpl();
 	}
 
@@ -136,11 +136,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Entry points
 		http.authorizeRequests()//
-		    .antMatchers("/api/v1/auth/signin")
+		    .antMatchers("/api/v1/signin")
 		    .permitAll()
-		    .antMatchers("/api/v1/auth/signup")
-		    .permitAll()
-		    .antMatchers("/h2-console/**/**")
+		    .antMatchers("/api/v1/signup")
 		    .permitAll()
 		    // Disallow everything else..
 		    .anyRequest()
@@ -161,16 +159,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity web) throws Exception {
 		// Allow swagger to be accessed without authentication
 		web.ignoring()
-		   .antMatchers("/v1/api-docs")//
+		   .antMatchers("/v2/api-docs")//
 		   .antMatchers("/swagger-resources/**")//
 		   .antMatchers("/swagger-ui.html")//
 		   .antMatchers("/configuration/**")//
 		   .antMatchers("/webjars/**")//
 		   .antMatchers("/public");
 
-		   // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-//		   .and()
-//		   .ignoring()
-//		   .antMatchers("/h2-console/**/**");
+		// Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
+		//		   .and()
+		//		   .ignoring()
+		//		   .antMatchers("/h2-console/**/**");
 	}
 }
