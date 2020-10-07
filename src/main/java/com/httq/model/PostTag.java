@@ -1,5 +1,8 @@
 package com.httq.model;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,11 +12,15 @@ public class PostTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(referencedColumnName = "id")
-    private Tag tagId;
+    @OneToOne
+    @JoinColumn(name = "tag_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Tag tag;
 
-    @JoinColumn(referencedColumnName = "id")
-    private Post postId;
+    @OneToOne
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Post post;
 
     public PostTag() {
     }
@@ -26,19 +33,19 @@ public class PostTag {
         this.id = id;
     }
 
-    public Tag getTagId() {
-        return tagId;
+    public Tag getTag() {
+        return tag;
     }
 
-    public void setTagId(Tag tagId) {
-        this.tagId = tagId;
+    public void setTag(Tag tag) {
+        this.tag = tag;
     }
 
-    public Post getPostId() {
-        return postId;
+    public Post getPost() {
+        return post;
     }
 
-    public void setPostId(Post postId) {
-        this.postId = postId;
+    public void setPost(Post post) {
+        this.post = post;
     }
 }

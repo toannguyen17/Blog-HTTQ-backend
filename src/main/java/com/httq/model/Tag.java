@@ -5,17 +5,16 @@ import javax.persistence.*;
 @Entity
 @Table(name = "tags")
 public class Tag {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String content;
+    @Column(unique = true)
+    private String tag;
 
     private long counter;
 
     public Tag() {
-        this.counter = 0;
     }
 
     public Long getId() {
@@ -26,23 +25,19 @@ public class Tag {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
+    public String getTag() {
+        return tag;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public long getCounter() {
         return counter;
     }
 
-    public void resetCounter() {
-        this.counter = 0;
-    }
-
-    public void count(){
-        this.counter++;
+    public void setCounter(long counter) {
+        this.counter = counter;
     }
 }
