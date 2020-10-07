@@ -37,8 +37,6 @@ public class DatabaseSeeder {
 		if (!u.isPresent()) {
 			String password = bCryptPasswordEncoder.encode("123456");
 			User   user     = new User();
-			user.setFirstName("Admin");
-			user.setLastName("HTTQ");
 			user.setEmail("admin@admin.com");
 			user.setPassword(password);
 

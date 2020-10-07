@@ -3,52 +3,74 @@ package com.httq.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name="UserInfos")
+@Table(name = "user_info")
 public class UserInfo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    @OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId",referencedColumnName = "id",nullable = false)
-    private User user;
+	@Column(name = "last_name", nullable = false)
+	private String lastName;
 
-    private String phone;
+	@Column(name = "first_name", nullable = false)
+	private String firstName;
 
-    private String address;
+	@OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+	@JoinColumn(unique = true, name = "userId", referencedColumnName = "id", nullable = false)
+	private User user;
 
-    public UserInfo() {
+	private String phone;
+
+	private String address;
+
+	public UserInfo() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+    public String getLastName() {
+        return lastName;
     }
 
-    public Long getId() {
-        return id;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 }
