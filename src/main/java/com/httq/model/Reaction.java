@@ -1,5 +1,8 @@
 package com.httq.model;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,13 +12,17 @@ public class Reaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(referencedColumnName = "id")
-    private Post postId;
+    @OneToOne
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Post post;
 
-    @JoinColumn(referencedColumnName = "id")
-    private User userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
-    private PostReaction type;
+    private PostReaction postReaction;
 
     public Reaction() {
     }
@@ -28,27 +35,27 @@ public class Reaction {
         this.id = id;
     }
 
-    public Post getPostId() {
-        return postId;
+    public Post getPost() {
+        return post;
     }
 
-    public void setPostId(Post postId) {
-        this.postId = postId;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public PostReaction getType() {
-        return type;
+    public PostReaction getPostReaction() {
+        return postReaction;
     }
 
-    public void setType(PostReaction type) {
-        this.type = type;
+    public void setPostReaction(PostReaction postReaction) {
+        this.postReaction = postReaction;
     }
 }

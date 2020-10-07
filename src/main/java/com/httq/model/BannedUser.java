@@ -1,55 +1,75 @@
 package com.httq.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "banned_users")
 public class BannedUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private LocalDateTime createdAt;
+	@OneToOne
+	@JoinColumn(name = "user_id", referencedColumnName = "id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private User user;
 
-    @JoinColumn(referencedColumnName = "id")
-    private User userId;
+	private long duration;
 
-    private long duration;
+	@Column(name = "created_at", nullable = false)
+	@CreationTimestamp
+	private LocalDateTime createdAt;
 
-    public BannedUser() {
-    }
+	@Column(name = "updated_at", nullable = false)
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
 
-    public Long getId() {
-        return id;
-    }
+	public BannedUser() {
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    public User getUserId() {
-        return userId;
-    }
+	public void setUser(User user) {
+		this.user = user;
+	}
 
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
+	public long getDuration() {
+		return duration;
+	}
 
-    public long getDuration() {
-        return duration;
-    }
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
 
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 }
