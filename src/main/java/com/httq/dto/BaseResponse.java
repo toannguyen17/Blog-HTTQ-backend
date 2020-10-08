@@ -14,6 +14,16 @@ public class BaseResponse<T> {
 		msg       = "";
 	}
 
+	public BaseResponse(T data) {
+		this.data = data;
+	}
+
+	public BaseResponse(T data, String msg, Integer status) {
+		this.status = status;
+		this.msg    = msg;
+		this.data   = data;
+	}
+
 	public Integer getStatus() {
 		return status;
 	}

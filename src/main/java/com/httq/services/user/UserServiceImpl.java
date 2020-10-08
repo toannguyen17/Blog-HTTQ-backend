@@ -1,6 +1,7 @@
 package com.httq.services.user;
 
 import com.httq.config.JwtTokenProvider;
+import com.httq.dto.AuthResponse;
 import com.httq.dto.user.UserResponseDTO;
 import com.httq.exception.CustomException;
 import com.httq.model.Role;
@@ -97,32 +98,30 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	public String signin(String email, String password) throws CustomException {
+	public AuthResponse authenticate(String email, String password) throws CustomException {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 			Optional<User> optionalUser = userRepository.findByEmail(email);
 			if (optionalUser.isPresent()) {
 				User user = optionalUser.get();
-				return jwtTokenProvider.createToken(email, user.getRoles());
+				return new AuthResponse(getInfo(user), jwtTokenProvider.createToken(email, user.getRoles()));
 			}
 		} catch (AuthenticationException ignored) {
 		}
 		throw new CustomException("Invalid email/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-	public String signup(User user) throws CustomException {
+	public AuthResponse signup(User user) throws CustomException {
 		if (!userRepository.existsByEmail(user.getEmail())) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
-
 			user.setRoles(Collections.singletonList(Role.ROLE_USER));
-
 			user.setEnabled(true);
 			user.setAccountNonLocked(true);
 			user.setAccountNonExpired(true);
 			user.setCredentialsNonExpired(true);
-
 			userRepository.save(user);
-			return jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
+
+			return new AuthResponse(getInfo(user), jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
 		} else {
 			throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
 		}

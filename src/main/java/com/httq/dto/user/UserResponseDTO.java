@@ -3,7 +3,6 @@ package com.httq.dto.user;
 import java.util.List;
 
 import com.httq.model.Role;
-import io.swagger.annotations.ApiModelProperty;
 
 public class UserResponseDTO {
 
