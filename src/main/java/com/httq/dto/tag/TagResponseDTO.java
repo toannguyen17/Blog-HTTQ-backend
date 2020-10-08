@@ -1,18 +1,15 @@
-package com.httq.model;
+package com.httq.dto.tag;
 
-import javax.persistence.*;
+import io.swagger.annotations.ApiModelProperty;
 
-@Entity
-@Table(name = "tags")
-public class Tag {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class TagResponseDTO {
+    @ApiModelProperty(position = 0)
     private Long id;
 
-    @Column(unique = true)
+    @ApiModelProperty(position = 1)
     private String tag;
 
-    public Tag() {
+    public TagResponseDTO() {
     }
 
     public Long getId() {

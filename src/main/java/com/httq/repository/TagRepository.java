@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TagRepository extends CrudRepository<Tag,Long> {
+    Iterable<Tag> findAllByContent(String content);
+    void deleteByTag(String tag);
 }
