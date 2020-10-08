@@ -1,6 +1,5 @@
 package com.httq.dto.user;
 
-
 public class UserDataDTO {
   
   private String email;

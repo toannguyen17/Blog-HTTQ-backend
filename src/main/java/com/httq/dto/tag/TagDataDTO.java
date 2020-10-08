@@ -1,6 +1,5 @@
 package com.httq.dto.tag;
 
-
 public class TagDataDTO {
     private String tag;
 

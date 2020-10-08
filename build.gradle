@@ -24,8 +24,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
 	compile group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.8'
