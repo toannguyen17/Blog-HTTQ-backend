@@ -1,12 +1,8 @@
 package com.httq.dto.tag;
 
-import io.swagger.annotations.ApiModelProperty;
-
 public class TagResponseDTO {
-    @ApiModelProperty(position = 0)
     private Long id;
 
-    @ApiModelProperty(position = 1)
     private String tag;
 
     public TagResponseDTO() {

@@ -7,25 +7,18 @@ import io.swagger.annotations.ApiModelProperty;
 
 public class UserResponseDTO {
 
-	@ApiModelProperty(position = 0)
 	private Long id;
 
-	@ApiModelProperty(position = 1)
 	private String  email;
 
-	@ApiModelProperty(position = 2)
 	private String lastName;
 
-	@ApiModelProperty(position = 3)
 	private String firstName;
 
-	@ApiModelProperty(position = 4)
 	private String phone;
 
-	@ApiModelProperty(position = 5)
 	private String address;
 
-	@ApiModelProperty(position = 6)
 	List<Role> roles;
 
 	public Long getId() {
