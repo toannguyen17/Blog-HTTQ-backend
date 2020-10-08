@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PostTagRepository extends CrudRepository<PostTag, Long> {
-	Integer countAll();
 }
