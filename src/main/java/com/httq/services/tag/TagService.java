@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface TagService extends IGeneralService<Tag> {
-   long countByTag(String tag);
+   Integer countByTag(String tag);
    void deleteByTag(String tag);
 }

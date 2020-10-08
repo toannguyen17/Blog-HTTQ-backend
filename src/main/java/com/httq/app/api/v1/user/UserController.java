@@ -21,13 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@Api(tags = "api/v1/user")
 public class UserController {
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private ModelMapper modelMapper;
 
 	@GetMapping(value = "me")
 	public ResponseEntity<BaseResponse<UserResponseDTO>> getMyInfo(HttpServletRequest req) {
