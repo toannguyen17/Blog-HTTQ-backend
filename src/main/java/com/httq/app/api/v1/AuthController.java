@@ -3,6 +3,7 @@ package com.httq.app.api.v1;
 import com.httq.dto.AuthResponse;
 import com.httq.dto.BaseResponse;
 import com.httq.dto.user.UserDataDTO;
+import com.httq.dto.user.UserRegisterForm;
 import com.httq.exception.CustomException;
 import com.httq.model.User;
 import com.httq.services.user.UserService;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("api/v1/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 	@Autowired
 	private UserService userService;
@@ -25,12 +26,10 @@ public class AuthController {
 	private ModelMapper modelMapper;
 
 	@PostMapping("authenticate")
-	public ResponseEntity<BaseResponse<AuthResponse>> authenticate(
-		@RequestParam String email,
-		@RequestParam String password) {
+	public ResponseEntity<BaseResponse<AuthResponse>> authenticate(@RequestBody UserDataDTO userData) {
 		BaseResponse<AuthResponse> response = new BaseResponse<>();
 		try {
-			response.setData(userService.authenticate(email, password));
+			response.setData(userService.authenticate(userData.getEmail(), userData.getPassword()));
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
@@ -39,10 +38,10 @@ public class AuthController {
 	}
 
 	@PostMapping("signup")
-	public ResponseEntity<BaseResponse<AuthResponse>> signup(@RequestBody UserDataDTO user) {
+	public ResponseEntity<BaseResponse<AuthResponse>> signup(@RequestBody UserRegisterForm form) {
 		BaseResponse<AuthResponse> response = new BaseResponse<>();
 		try {
-			response.setData(userService.signup(modelMapper.map(user, User.class)));
+			response.setData(userService.signup(form));
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
@@ -50,7 +49,6 @@ public class AuthController {
 		}
 	}
 
-	@CrossOrigin("*")
 	@GetMapping("refresh")
 	public ResponseEntity<BaseResponse<String>> refresh(HttpServletRequest req) {
 		BaseResponse<String> response = new BaseResponse<>();

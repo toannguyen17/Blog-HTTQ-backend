@@ -16,6 +16,8 @@ public class UserResponseDTO {
 
 	private String phone;
 
+	private String gender;
+
 	private String address;
 
 	List<Role> roles;
@@ -74,5 +76,13 @@ public class UserResponseDTO {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 }

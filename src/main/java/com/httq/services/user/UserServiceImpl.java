@@ -1,7 +1,9 @@
 package com.httq.services.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.httq.config.JwtTokenProvider;
 import com.httq.dto.AuthResponse;
+import com.httq.dto.user.UserRegisterForm;
 import com.httq.dto.user.UserResponseDTO;
 import com.httq.exception.CustomException;
 import com.httq.model.Role;
@@ -9,6 +11,7 @@ import com.httq.model.User;
 import com.httq.model.UserInfo;
 import com.httq.repository.UserInfoRepository;
 import com.httq.repository.UsersRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +44,8 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	public ModelMapper modelMapper;
 
 	@Override
 	public Iterable<User> findAll() {
@@ -111,9 +116,10 @@ public class UserServiceImpl implements UserService {
 		throw new CustomException("Invalid email/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-	public AuthResponse signup(User user) throws CustomException {
-		if (!userRepository.existsByEmail(user.getEmail())) {
-			user.setPassword(passwordEncoder.encode(user.getPassword()));
+	public AuthResponse signup(UserRegisterForm form) throws CustomException {
+		if (!userRepository.existsByEmail(form.getEmail())) {
+			User user = modelMapper.map(form, User.class);
+			user.setPassword(passwordEncoder.encode(form.getPassword()));
 			user.setRoles(Collections.singletonList(Role.ROLE_USER));
 			user.setEnabled(true);
 			user.setAccountNonLocked(true);
@@ -121,7 +127,11 @@ public class UserServiceImpl implements UserService {
 			user.setCredentialsNonExpired(true);
 			userRepository.save(user);
 
-			return new AuthResponse(getInfo(user), jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
+			UserInfo userInfo = modelMapper.map(form, UserInfo.class);
+			userInfo.setUser(user);
+			userInfoRepository.save(userInfo);
+
+			return new AuthResponse(getInfo(user, userInfo), jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
 		} else {
 			throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -136,19 +146,28 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public UserResponseDTO getInfo(User user) {
+		return getInfo(user, null);
+	}
+
+	public UserResponseDTO getInfo(User user, UserInfo userInfo) {
 		UserResponseDTO userResponse = new UserResponseDTO();
 		userResponse.setId(user.getId());
 		userResponse.setEmail(user.getEmail());
 		userResponse.setRoles(user.getRoles());
 
-		Optional<UserInfo> optionalUserInfo = userInfoRepository.findByUser(user);
-		if (optionalUserInfo.isPresent()) {
-			UserInfo userInfo = optionalUserInfo.get();
+		if (userInfo == null) {
+			Optional<UserInfo> optionalUserInfo = userInfoRepository.findByUser(user);
+			userInfo = optionalUserInfo.orElse(null);
+		}
+
+		if (userInfo != null) {
 			userResponse.setLastName(userInfo.getLastName());
 			userResponse.setFirstName(userInfo.getFirstName());
 			userResponse.setAddress(userInfo.getAddress());
+			userResponse.setGender(userInfo.getGender());
 			userResponse.setPhone(userInfo.getPhone());
 		}
+
 		return userResponse;
 	}
 
