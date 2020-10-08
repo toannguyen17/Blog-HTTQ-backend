@@ -1,13 +1,10 @@
 package com.httq.dto.user;
 
-import io.swagger.annotations.ApiModelProperty;
 
 public class UserDataDTO {
   
-  @ApiModelProperty(position = 0)
   private String email;
 
-  @ApiModelProperty(position = 1)
   private String password;
 
   public String getEmail() {

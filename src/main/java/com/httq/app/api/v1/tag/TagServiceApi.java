@@ -54,6 +54,21 @@ public class TagServiceApi {
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-
-
+    @PostMapping(value = "/tags")
+    public ResponseEntity<BaseResponse<Tag>> addTags(@RequestBody String tag) {
+        BaseResponse<Tag> baseResponse = new BaseResponse<>();
+        if (tag.replace(" ", "").length() > 0) {
+            Tag t = new Tag();
+            t.setTag(tag);
+            tagService.save(t);
+            baseResponse.setStatus(20);
+            baseResponse.setMsg("Tag saved.");
+            baseResponse.setData(t);
+        } else {
+            baseResponse.setStatus(31);
+            baseResponse.setMsg("Tag is blank");
+            baseResponse.setData(null);
+        }
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
 }

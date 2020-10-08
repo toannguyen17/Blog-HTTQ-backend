@@ -26,14 +26,9 @@ public class AuthController {
 	private ModelMapper modelMapper;
 
 	@PostMapping("signin")
-	@ApiOperation(value = "${AuthController.signin}")
-	@ApiResponses(value = {
-		@ApiResponse(code = 400, message = "Something went wrong"),
-		@ApiResponse(code = 422, message = "Invalid email/password supplied")
-	})
 	public ResponseEntity<BaseResponse<String>> signin(
-		@ApiParam("Email") @RequestParam String email,
-		@ApiParam("Password") @RequestParam String password)
+		 @RequestParam String email,
+		 @RequestParam String password)
 	{
 		BaseResponse<String> response = new BaseResponse<String>();
 		try {
@@ -47,13 +42,7 @@ public class AuthController {
 	}
 
 	@PostMapping("signup")
-	@ApiOperation(value = "${AuthController.signup}")
-	@ApiResponses(value = {
-		@ApiResponse(code = 400, message = "Something went wrong"),
-		@ApiResponse(code = 403, message = "Access denied"),
-		@ApiResponse(code = 422, message = "Email is already in use")
-	})
-	public ResponseEntity<BaseResponse<String>> signup(@ApiParam("Signup User") @RequestBody UserDataDTO user)
+	public ResponseEntity<BaseResponse<String>> signup(@RequestBody UserDataDTO user)
 	{
 		BaseResponse<String> response = new BaseResponse<String>();
 		try {
@@ -67,7 +56,6 @@ public class AuthController {
 	}
 
 	@GetMapping("refresh")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 	public ResponseEntity<BaseResponse<String>> refresh(HttpServletRequest req) {
 		BaseResponse<String> response = new BaseResponse<String>();
 		try {
