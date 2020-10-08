@@ -1,6 +1,7 @@
 package com.httq.services.user;
 
 import com.httq.dto.AuthResponse;
+import com.httq.dto.user.UserRegisterForm;
 import com.httq.dto.user.UserResponseDTO;
 import com.httq.exception.CustomException;
 import com.httq.model.User;
@@ -19,7 +20,7 @@ public interface UserService extends IGeneralService<User> {
 
 	AuthResponse authenticate(String email, String password) throws CustomException;
 
-	AuthResponse signup(User user) throws CustomException;
+	AuthResponse signup(UserRegisterForm form) throws CustomException;
 
 	User search(String email);
 

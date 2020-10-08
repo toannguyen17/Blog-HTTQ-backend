@@ -21,6 +21,8 @@ public class UserInfo {
 
 	private String phone;
 
+	private String gender;
+
 	private String address;
 
 	public UserInfo() {
@@ -73,4 +75,12 @@ public class UserInfo {
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
 }
