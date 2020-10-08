@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -39,6 +40,12 @@ public class Post {
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(name = "post-tags", joinColumns = {@JoinColumn(name = "post_id",referencedColumnName = "id")},
+               inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
+    private List<Tag> tags;
+
 
     public Post() {
     }
