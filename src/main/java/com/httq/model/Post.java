@@ -42,10 +42,9 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @ManyToMany
-    @JoinTable(name = "post-tags", joinColumns = {@JoinColumn(name = "post_id",referencedColumnName = "id")},
+    @JoinTable(name = "post_tags", joinColumns = {@JoinColumn(name = "post_id",referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
     private List<Tag> tags;
-
 
     public Post() {
     }

@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("api/v1")
-@Api(tags = "api/v1")
 public class AuthController {
 	@Autowired
 	private UserService userService;
@@ -25,31 +24,29 @@ public class AuthController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	@PostMapping("signin")
-	public ResponseEntity<BaseResponse<String>> signin(
-		 @RequestParam String email,
-		 @RequestParam String password)
-	{
-		BaseResponse<String> response = new BaseResponse<String>();
+	@PostMapping("authenticate")
+	public ResponseEntity<BaseResponse<String>> authenticate(
+		@RequestParam String email,
+		@RequestParam String password) {
+		BaseResponse<String> response = new BaseResponse<>();
 		try {
 			String token = userService.signin(email, password);
 			response.setData(token);
 			return new ResponseEntity<>(response, HttpStatus.OK);
-		}catch (CustomException customException){
+		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
 			return new ResponseEntity<>(response, customException.getHttpStatus());
 		}
 	}
 
 	@PostMapping("signup")
-	public ResponseEntity<BaseResponse<String>> signup(@RequestBody UserDataDTO user)
-	{
-		BaseResponse<String> response = new BaseResponse<String>();
+	public ResponseEntity<BaseResponse<String>> signup(@RequestBody UserDataDTO user) {
+		BaseResponse<String> response = new BaseResponse<>();
 		try {
 			String token = userService.signup(modelMapper.map(user, User.class));
 			response.setData(token);
 			return new ResponseEntity<>(response, HttpStatus.OK);
-		}catch (CustomException customException){
+		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
 			return new ResponseEntity<>(response, customException.getHttpStatus());
 		}
@@ -57,12 +54,12 @@ public class AuthController {
 
 	@GetMapping("refresh")
 	public ResponseEntity<BaseResponse<String>> refresh(HttpServletRequest req) {
-		BaseResponse<String> response = new BaseResponse<String>();
+		BaseResponse<String> response = new BaseResponse<>();
 		try {
 			String token = userService.refresh(req.getRemoteUser());
 			response.setData(token);
 			return new ResponseEntity<>(response, HttpStatus.OK);
-		}catch (CustomException customException){
+		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
 			return new ResponseEntity<>(response, customException.getHttpStatus());
 		}

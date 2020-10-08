@@ -32,15 +32,10 @@ public class TagServiceImpl implements TagService {
         tagRepository.deleteById(id);
     }
 
-
     @Override
-    public long countByTag(String tag) {
-        Iterable<Tag> tags = tagRepository.findAllByContent(tag);
-        long counter = 0;
-        while (tags.iterator().hasNext()){
-            counter++;
-        }
-        return counter;
+    public Integer countByTag(String tag) {
+//        Iterable<Tag> tags = tagRepository.findAllByTagContains(tag);
+        return tagRepository.countAllByTagContains(tag);
     }
 
     @Override
