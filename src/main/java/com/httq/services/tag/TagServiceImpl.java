@@ -42,4 +42,9 @@ public class TagServiceImpl implements TagService {
     public void deleteByTag(String tag) {
         tagRepository.deleteByTag(tag);
     }
+
+    @Override
+    public Optional<Tag> findByTag(String tag) {
+        return tagRepository.findByTag(tag);
+    }
 }
