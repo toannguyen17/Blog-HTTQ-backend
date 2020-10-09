@@ -11,4 +11,5 @@ public interface TagService extends IGeneralService<Tag> {
    Integer countByTag(String tag);
    void deleteByTag(String tag);
    Optional<Tag> findByTag(String tag);
+   Iterable<Tag> findAllByTagContains(String tag);
 }

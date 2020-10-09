@@ -47,4 +47,8 @@ public class TagServiceImpl implements TagService {
     public Optional<Tag> findByTag(String tag) {
         return tagRepository.findByTag(tag);
     }
+
+    public Iterable<Tag> findAllByTagContains(String tag){
+        return tagRepository.findAllByTagContains(tag);
+    }
 }
