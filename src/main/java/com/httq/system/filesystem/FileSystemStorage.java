@@ -4,7 +4,6 @@ package com.httq.system.filesystem;
 import com.httq.system.filesystem.exception.FileNotFoundException;
 import com.httq.system.filesystem.exception.StorageException;
 
-import com.httq.system.properties.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
