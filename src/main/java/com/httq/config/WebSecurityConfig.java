@@ -1,7 +1,6 @@
 package com.httq.config;
 
 import com.httq.services.user.UserDetailsServiceImpl;
-import com.httq.system.properties.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,7 +38,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableConfigurationProperties(StorageProperties.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -104,18 +102,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement()
 		    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-		// Entry points
 		http.authorizeRequests()
-		    .antMatchers("/api/v1/auth/authenticate")
-		    .permitAll()
-		    .antMatchers("/api/v1/auth/signup")
-		    .permitAll()
-		    // Disallow everything else..
-		    .anyRequest()
-		    .authenticated();
+				    .antMatchers("/**")
+				    .permitAll();
 
-		// Apply JWT
-		http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+		// Entry points
+//		http.authorizeRequests()
+//		    .antMatchers("/api/v1/auth/authenticate")
+//		    .permitAll()
+//		    .antMatchers("/api/v1/auth/signup")
+//		    .permitAll()
+//		    // Disallow everything else..
+//		    .anyRequest()
+//		    .authenticated();
+//
+//		// Apply JWT
+//		http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
 	}
 
 	@Bean
