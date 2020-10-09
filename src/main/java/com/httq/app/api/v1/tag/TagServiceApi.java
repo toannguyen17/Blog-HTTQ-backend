@@ -57,7 +57,7 @@ public class TagServiceApi {
     @PostMapping
     public ResponseEntity<BaseResponse<Tag>> addTag(@RequestParam("tag") String tag) {
         BaseResponse<Tag> baseResponse = new BaseResponse<>();
-        if (tagService.findByTag(tag).isPresent()){
+        if (tagService.findByTag(tag).isPresent()) {
             baseResponse.setStatus(32);
             baseResponse.setMsg("TAG EXISTED");
             baseResponse.setData(null);
@@ -75,6 +75,22 @@ public class TagServiceApi {
             baseResponse.setMsg("TAG CANNOT BE BLANK");
             baseResponse.setData(null);
         }
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("search")
+    public ResponseEntity<BaseResponse<Iterable<Tag>>> searchTag(@RequestParam("key")String key) {
+        BaseResponse<Iterable<Tag>> baseResponse = new BaseResponse<>();
+        Iterable<Tag>               tags         = tagService.findAllByTagContains(key);
+        if (tags.iterator().hasNext()) {
+            baseResponse.setStatus(20);
+            baseResponse.setMsg("TAGS WERE FOUND");
+        } else {
+            baseResponse.setStatus(51);
+            baseResponse.setMsg("FOUND NO TAGS");
+        }
+        baseResponse.setData(tags);
+
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 }
