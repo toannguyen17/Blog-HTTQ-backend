@@ -33,6 +33,7 @@ public class AuthController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
+			response.setStatus(customException.getHttpStatus().value());
 			return new ResponseEntity<>(response, customException.getHttpStatus());
 		}
 	}
@@ -45,6 +46,7 @@ public class AuthController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
+			response.setStatus(customException.getHttpStatus().value());
 			return new ResponseEntity<>(response, customException.getHttpStatus());
 		}
 	}
@@ -58,6 +60,7 @@ public class AuthController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
+			response.setStatus(customException.getHttpStatus().value());
 			return new ResponseEntity<>(response, customException.getHttpStatus());
 		}
 	}
