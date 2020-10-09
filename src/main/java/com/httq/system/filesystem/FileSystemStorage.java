@@ -8,6 +8,7 @@ import com.httq.system.properties.StorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -29,14 +30,16 @@ import java.util.Objects;
 @Component
 @EnableConfigurationProperties(HibernateProperties.class)
 public class FileSystemStorage implements Storage {
-    @Autowired
-    private StorageProperties storageProperties;
 
-    public FileSystemStorage() {
+    private String storageFolder;
+
+    @Autowired
+    public FileSystemStorage(Environment environment) {
+        this.storageFolder = environment.getProperty("upload_storage");
     }
 
     private String getLocation(String path) {
-        return storageProperties.getLocation() + "/" + path;
+        return storageFolder + "/" + path;
     }
 
     /*
