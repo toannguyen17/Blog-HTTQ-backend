@@ -20,6 +20,9 @@ public class Post {
 
     private String subTitle;
 
+    @Column(name = "seo", unique = true)
+    private String seo;
+
     @Lob
     private String content;
 
@@ -119,5 +122,21 @@ public class Post {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getSeo() {
+        return seo;
+    }
+
+    public void setSeo(String seo) {
+        this.seo = seo;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }
