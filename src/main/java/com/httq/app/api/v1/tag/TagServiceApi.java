@@ -17,58 +17,80 @@ import java.util.Optional;
 //20 - OK
 //1 -
 @RestController
-@RequestMapping(value = "/api/v1/tag/")
+@RequestMapping("api/v1/tags")
 public class TagServiceApi {
     @Autowired
     private TagService tagService;
 
-    @GetMapping(value = "/all-tags")
+    @GetMapping("all")
     public ResponseEntity<BaseResponse<Iterable<Tag>>> getAllTags() {
         BaseResponse<Iterable<Tag>> baseResponse = new BaseResponse<>();
         Iterable<Tag>               tags         = tagService.findAll();
-        if (tags.iterator().hasNext()) {
+        if (!tags.iterator().hasNext()) {
             baseResponse.setStatus(51);
-            baseResponse.setMsg("Found no tag.");
+            baseResponse.setMsg("FOUND NO TAG");
         } else {
             baseResponse.setStatus(20);
-            baseResponse.setMsg("Tags were loaded.");
+            baseResponse.setMsg("TAGS WERE FOUND");
         }
         baseResponse.setData(tags);
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/tags/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<BaseResponse<Tag>> deleteTagById(@PathVariable("id") Long id) {
         BaseResponse<Tag> baseResponse = new BaseResponse<>();
         Optional<Tag>     tag          = tagService.findById(id);
         if (!tag.isPresent()) {
             baseResponse.setStatus(52);
-            baseResponse.setMsg("Tag does not exist.");
+            baseResponse.setMsg("TAG DOES NOT EXIST");
             baseResponse.setData(null);
         } else {
             tagService.deleteById(id);
             baseResponse.setStatus(20);
-            baseResponse.setMsg("Deleted tag.");
+            baseResponse.setMsg("DELETE TAG");
             baseResponse.setData(tag.get());
         }
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/tags")
-    public ResponseEntity<BaseResponse<Tag>> addTags(@RequestBody String tag) {
+    @PostMapping
+    public ResponseEntity<BaseResponse<Tag>> addTag(@RequestParam("tag") String tag) {
         BaseResponse<Tag> baseResponse = new BaseResponse<>();
+        if (tagService.findByTag(tag).isPresent()) {
+            baseResponse.setStatus(32);
+            baseResponse.setMsg("TAG EXISTED");
+            baseResponse.setData(null);
+            return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+        }
         if (tag.replace(" ", "").length() > 0) {
             Tag t = new Tag();
             t.setTag(tag);
             tagService.save(t);
             baseResponse.setStatus(20);
-            baseResponse.setMsg("Tag saved.");
+            baseResponse.setMsg("TAG SAVED");
             baseResponse.setData(t);
         } else {
             baseResponse.setStatus(31);
-            baseResponse.setMsg("Tag is blank");
+            baseResponse.setMsg("TAG CANNOT BE BLANK");
             baseResponse.setData(null);
         }
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("search")
+    public ResponseEntity<BaseResponse<Iterable<Tag>>> searchTag(@RequestParam("key")String key) {
+        BaseResponse<Iterable<Tag>> baseResponse = new BaseResponse<>();
+        Iterable<Tag>               tags         = tagService.findAllByTagContains(key);
+        if (tags.iterator().hasNext()) {
+            baseResponse.setStatus(20);
+            baseResponse.setMsg("TAGS WERE FOUND");
+        } else {
+            baseResponse.setStatus(51);
+            baseResponse.setMsg("FOUND NO TAGS");
+        }
+        baseResponse.setData(tags);
+
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 }
