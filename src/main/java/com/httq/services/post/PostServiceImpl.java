@@ -40,4 +40,9 @@ public class PostServiceImpl implements PostService {
 	public boolean existsBySeo(String seo) {
 		return postRepository.existsBySeo(seo);
 	}
+
+	@Override
+	public Optional<Post> findBySeo(String seo) {
+		return postRepository.findBySeo(seo);
+	}
 }
