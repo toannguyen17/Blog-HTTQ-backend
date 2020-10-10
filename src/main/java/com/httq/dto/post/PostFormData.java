@@ -1,15 +1,24 @@
 package com.httq.dto.post;
 
+import com.httq.model.PostStatusList;
+import com.httq.model.Tag;
+
+import java.util.List;
+
 public class PostFormData {
 	private String title;
 
 	private String subTitle;
 
+	private String seo;
+
 	private String content;
 
 	private String contentPlainText;
 
-	private String status;
+	private PostStatusList status;
+
+	private List<Tag> tags;
 
 	public PostFormData(){
 
@@ -47,11 +56,27 @@ public class PostFormData {
 		this.contentPlainText = contentPlainText;
 	}
 
-	public String getStatus() {
+	public PostStatusList getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(PostStatusList status) {
 		this.status = status;
+	}
+
+	public String getSeo() {
+		return seo;
+	}
+
+	public void setSeo(String seo) {
+		this.seo = seo;
+	}
+
+	public List<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
 	}
 }

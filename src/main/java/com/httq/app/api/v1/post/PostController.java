@@ -1,56 +1,86 @@
 package com.httq.app.api.v1.post;
 
 import com.httq.app.helper.Str;
+import com.httq.dto.BaseResponse;
 import com.httq.dto.post.PostFormData;
+import com.httq.dto.post.PostViewData;
 import com.httq.model.Post;
-import com.httq.model.PostStatusList;
 import com.httq.services.post.PostService;
 import org.hashids.Hashids;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/post")
 public class PostController {
 
-	@Autowired
-	private PostService postService;
+    @Autowired
+    private PostService postService;
 
-	@Autowired
-	private Hashids hashids;
+    @Autowired
+    private Hashids hashids;
 
-	@Autowired
-	private Str str;
+    @Autowired
+    private Str str;
 
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	@GetMapping("{seo}")
-	public String getPostBySeo(){
-		return "";
-	}
+    @PostMapping
+    public String createPost(@RequestBody PostFormData formData) {
+        String seo = str.slug(formData.getTitle());
+        Post post = modelMapper.map(formData, Post.class);
 
-	@PostMapping
-	public String createPost(@RequestBody PostFormData formData){
-		String seo = str.slug(formData.getTitle());
-		Post post = modelMapper.map(formData, Post.class);
-		post.setStatus(PostStatusList.valueOf(formData.getStatus()));
+        if (postService.existsBySeo(seo)) {
+            seo += "-" + hashids.encode(new Date().getTime());
+        }
+        post.setSeo(seo);
+        postService.save(post);
+        return "";
+    }
 
-		if (postService.existsBySeo(seo)){
-			seo += "-" + hashids.encode(new Date().getTime());
-		}
-		post.setSeo(seo);
-		postService.save(post);
-		return "";
-	}
+    @PutMapping
+    public String updatePost( @RequestBody PostFormData formData) {
+        Optional<Post> optionalPost = postService.findBySeo(formData.getSeo());
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            post.setTitle(formData.getTitle());
+            post.setSubTitle(formData.getSubTitle());
+            post.setContent(formData.getContent());
+            post.setContentPlainText(formData.getContentPlainText());
+            post.setStatus(formData.getStatus());
 
-	@PutMapping()
-	public String updatePost(Post post){
+            String seo = str.slug(formData.getTitle());
+            Optional<Post> optionalPostCheck = postService.findBySeo(seo);
 
-		return "";
-	}
+            if (optionalPostCheck.isPresent() && !optionalPostCheck.get().getId().equals(post.getId())) {
+                seo += "-" + hashids.encode(new Date().getTime());
+            }
+            post.setSeo(seo);
 
+            postService.save(post);
+        }
+
+        return "";
+    }
+
+    @GetMapping("{seo}")
+    public ResponseEntity<BaseResponse<PostViewData>> getPostBySeo(@PathVariable String seo) {
+        Optional<Post> optionalPost = postService.findBySeo(seo);
+
+        BaseResponse<PostViewData> response = new BaseResponse<>();
+        if (optionalPost.isPresent()) {
+            PostViewData postView = modelMapper.map(optionalPost.get(), PostViewData.class);
+            response.setData(postView);
+        } else {
+            response.setStatus(404);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

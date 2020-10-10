@@ -1,5 +1,7 @@
 package com.httq.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -47,6 +49,7 @@ public class Post {
     @ManyToMany
     @JoinTable(name = "post_tags", joinColumns = {@JoinColumn(name = "post_id",referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
+    @JsonIgnoreProperties
     private List<Tag> tags;
 
     public Post() {
