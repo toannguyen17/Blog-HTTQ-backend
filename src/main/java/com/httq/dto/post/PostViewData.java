@@ -14,6 +14,16 @@ public class PostViewData {
 
 	private String content;
 
+	private String seo;
+
+	public String getSeo() {
+		return seo;
+	}
+
+	public void setSeo(String seo) {
+		this.seo = seo;
+	}
+
 	private User user;
 
 	private String status;
