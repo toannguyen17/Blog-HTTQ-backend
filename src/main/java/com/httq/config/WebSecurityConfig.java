@@ -1,6 +1,7 @@
 package com.httq.config;
 
 import com.httq.services.user.UserDetailsServiceImpl;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -42,6 +43,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+
+	@Bean
+	public Hashids hashids(){
+		return new Hashids("POST",6,"abcdefghijklmnopqrstuvwxyz1234567890");
+	}
 
 	@Bean
 	public JwtTokenFilter jwtTokenFilter() {
