@@ -15,6 +15,10 @@ public class Tag {
     public Tag() {
     }
 
+    public Tag(String tag) {
+        this.tag = tag;
+    }
+
     public Long getId() {
         return id;
     }
