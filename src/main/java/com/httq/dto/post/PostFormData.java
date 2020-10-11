@@ -1,7 +1,6 @@
 package com.httq.dto.post;
 
 import com.httq.model.PostStatusList;
-import com.httq.model.Tag;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class PostFormData {
 
 	private PostStatusList status;
 
-	private List<Tag> tags;
+	private List<String> tags;
 
 	public PostFormData(){
 
@@ -72,11 +71,11 @@ public class PostFormData {
 		this.seo = seo;
 	}
 
-	public List<Tag> getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 
-	public void setTags(List<Tag> tags) {
+	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
 }
