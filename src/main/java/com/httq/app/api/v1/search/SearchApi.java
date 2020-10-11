@@ -1,15 +1,13 @@
 package com.httq.app.api.v1.search;
 
 import com.httq.dto.BaseResponse;
+import com.httq.dto.search.SearchKey;
 import com.httq.model.SearchResult;
 import com.httq.services.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,9 +18,9 @@ public class SearchApi {
     private SearchService searchService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<List<SearchResult>>> search(@RequestParam("key") String key) {
+    public ResponseEntity<BaseResponse<List<SearchResult>>> search(@RequestBody SearchKey key) {
         BaseResponse<List<SearchResult>> baseResponse = new BaseResponse<>();
-        List<SearchResult>               results      = searchService.search(key);
+        List<SearchResult>               results      = searchService.search(key.getKey());
         if (results.size() > 0) {
             baseResponse.setStatus(20);
             baseResponse.setMsg("FOUND SOMETHINGS");
