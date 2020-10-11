@@ -44,7 +44,7 @@ public class SearchServiceImpl implements SearchService{
             sr.setType("USER");
             sr.setTitle(u.getEmail());
             sr.setDescription(u.getEmail());
-            sr.setReferenceId(u.getId());
+            sr.setReferenceId(u.getId().toString());
             results.add(sr);
         }
 
@@ -54,7 +54,7 @@ public class SearchServiceImpl implements SearchService{
             sr.setType("USER");
             sr.setTitle(u.getFirstName() + " " + u.getLastName());
             sr.setDescription(u.getGender() + " | " + u.getAddress());
-            sr.setReferenceId(u.getUser().getId());
+            sr.setReferenceId(u.getUser().getId().toString());
             results.add(sr);
         }
         return results;
@@ -66,7 +66,7 @@ public class SearchServiceImpl implements SearchService{
             sr.setType("POST");
             sr.setTitle(p.getTitle());
             sr.setDescription(p.getSubTitle());
-            sr.setReferenceId(p.getId());
+            sr.setReferenceId(p.getSeo());
             results.add(sr);
         }
     }

@@ -4,7 +4,7 @@ public class SearchResult {
     private String type;
     private String title;
     private String description;
-    private Long referenceId;
+    private String   referenceId;
 
 
     public SearchResult() {
@@ -18,11 +18,11 @@ public class SearchResult {
         this.type = type;
     }
 
-    public Long getReferenceId() {
+    public String getReferenceId() {
         return referenceId;
     }
 
-    public void setReferenceId(Long referenceId) {
+    public void setReferenceId(String referenceId) {
         this.referenceId = referenceId;
     }
 
