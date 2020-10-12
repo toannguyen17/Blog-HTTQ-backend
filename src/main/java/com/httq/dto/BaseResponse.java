@@ -9,13 +9,12 @@ public class BaseResponse<T> {
 	private Long timestamp;
 
 	public BaseResponse() {
-		timestamp = new Date().getTime();
-		status    = 0;
-		msg       = "";
+		defaultData();
 	}
 
 	public BaseResponse(T data) {
 		this.data = data;
+		defaultData();
 	}
 
 	public BaseResponse(T data, String msg, Integer status) {
@@ -54,5 +53,11 @@ public class BaseResponse<T> {
 
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public void defaultData() {
+		timestamp = new Date().getTime();
+		status    = 0;
+		msg       = "";
 	}
 }
