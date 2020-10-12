@@ -29,4 +29,6 @@ public interface UserService extends IGeneralService<User> {
 	UserResponseDTO myInfo(HttpServletRequest req);
 
 	String refresh(String email) throws CustomException;
+
+	boolean changePassword(String email, String password,String newPassword) throws CustomException;
 }
