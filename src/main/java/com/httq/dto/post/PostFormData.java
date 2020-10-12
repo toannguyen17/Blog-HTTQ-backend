@@ -13,6 +13,8 @@ public class PostFormData {
 
 	private String content;
 
+	private String thumbnail;
+
 	private String contentPlainText;
 
 	private PostStatusList status;
@@ -77,5 +79,13 @@ public class PostFormData {
 
 	public void setTags(List<String> tags) {
 		this.tags = tags;
+	}
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 }

@@ -6,20 +6,26 @@ import com.httq.dto.post.PostFormData;
 import com.httq.dto.post.PostViewData;
 import com.httq.model.Post;
 import com.httq.model.Tag;
+import com.httq.model.User;
 import com.httq.services.post.PostService;
 import com.httq.services.tag.TagService;
+import com.httq.system.auth.Auth;
 import org.hashids.Hashids;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/api/v1/post")
@@ -40,10 +46,17 @@ public class PostController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private Auth auth;
+
     @PostMapping
     public String createPost(@RequestBody PostFormData formData) {
         String seo = str.slug(formData.getTitle());
         Post post = modelMapper.map(formData, Post.class);
+
+        User user = auth.user();
+
+        post.setUser(user);
 
         if (postService.existsBySeo(seo)) {
             seo += "-" + hashids.encode(new Date().getTime());
@@ -114,12 +127,19 @@ public class PostController {
         return "";
     }
 
+//    @PreAuthorize()
     @GetMapping("{seo}")
     public ResponseEntity<BaseResponse<PostViewData>> getPostBySeo(@PathVariable String seo) {
         Optional<Post> optionalPost = postService.findBySeo(seo);
 
         BaseResponse<PostViewData> response = new BaseResponse<>();
         if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            long view = post.getView();
+            ++view;
+            post.setView(view);
+            post.setViewTrend(view);
+            postService.save(post);
             PostViewData postView = modelMapper.map(optionalPost.get(), PostViewData.class);
             response.setData(postView);
         } else {

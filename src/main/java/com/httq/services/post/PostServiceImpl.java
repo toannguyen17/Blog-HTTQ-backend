@@ -45,4 +45,19 @@ public class PostServiceImpl implements PostService {
 	public Optional<Post> findBySeo(String seo) {
 		return postRepository.findBySeo(seo);
 	}
+
+	@Override
+	public Iterable<Post> lastPost() {
+		return postRepository.findTop8ByOrderByIdDesc();
+	}
+
+	@Override
+	public Iterable<Post> findTop10Trending() {
+		return postRepository.findTop10Trending();
+	}
+
+	@Override
+	public Iterable<Post> findTop21Trending() {
+		return postRepository.findTop21Trending();
+	}
 }
