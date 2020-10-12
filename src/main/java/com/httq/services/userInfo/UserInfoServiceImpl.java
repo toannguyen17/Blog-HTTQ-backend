@@ -32,4 +32,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     public void deleteById(Long id) {
         userInfoRepository.deleteById(id);
     }
+
+
+    @Override
+    public Optional<UserInfo> getUser(Long id) {
+        return userInfoRepository.findById(id);
+    }
 }

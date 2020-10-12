@@ -1,5 +1,7 @@
 package com.httq.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 @Entity
@@ -17,6 +19,7 @@ public class UserInfo {
 
 	@OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
 	@JoinColumn(unique = true, name = "userId", referencedColumnName = "id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 
 	private String phone;
