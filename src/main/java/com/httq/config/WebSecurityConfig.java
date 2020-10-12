@@ -95,8 +95,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.disable();
 
 		// No session will be created or used by spring security
-		http.sessionManagement()
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//		http.sessionManagement()
+//			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 //		http.authorizeRequests()
 //				    .antMatchers("/**")
@@ -107,8 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(
 				"/api/v1/home",
 				"/api/v1/search",
-				"/api/v1/auth/authenticate",
-				"/api/v1/auth/signup",
+				"/api/v1/auth/**",
 				"/api/v1/post/{seo}")
 			.permitAll()
 			// Disallow everything else..

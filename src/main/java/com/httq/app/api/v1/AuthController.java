@@ -5,9 +5,7 @@ import com.httq.dto.BaseResponse;
 import com.httq.dto.user.UserDataDTO;
 import com.httq.dto.user.UserRegisterForm;
 import com.httq.exception.CustomException;
-import com.httq.model.User;
 import com.httq.services.user.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthController {
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private ModelMapper modelMapper;
 
 	@PostMapping("authenticate")
 	public ResponseEntity<BaseResponse<AuthResponse>> authenticate(@RequestBody UserDataDTO userData) {

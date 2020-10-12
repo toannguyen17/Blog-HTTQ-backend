@@ -147,4 +147,13 @@ public class PostController {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("{seo}")
+    public String doDeletePostBySeo(@PathVariable String seo){
+        Optional<Post> optionalPost = postService.findBySeo(seo);
+        if (optionalPost.isPresent()) {
+            postService.deleteById(optionalPost.get().getId());
+        }
+        return "";
+    }
 }
