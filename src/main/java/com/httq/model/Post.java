@@ -1,5 +1,6 @@
 package com.httq.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -19,6 +20,17 @@ public class Post {
     private String title;
 
     private String subTitle;
+
+    private String thumbnail;
+
+    @Column(name = "view", nullable = false)
+    private long view;
+
+    @Column(name = "view_trend", nullable = false)
+    private long viewTrend;
+
+    @Column(name = "seo", unique = true)
+    private String seo;
 
     @Lob
     private String content;
@@ -44,6 +56,7 @@ public class Post {
     @ManyToMany
     @JoinTable(name = "post_tags", joinColumns = {@JoinColumn(name = "post_id",referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
+    @JsonIgnoreProperties
     private List<Tag> tags;
 
     public Post() {
@@ -119,5 +132,45 @@ public class Post {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getSeo() {
+        return seo;
+    }
+
+    public void setSeo(String seo) {
+        this.seo = seo;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public long getView() {
+        return view;
+    }
+
+    public void setView(long view) {
+        this.view = view;
+    }
+
+    public long getViewTrend() {
+        return viewTrend;
+    }
+
+    public void setViewTrend(long viewTrend) {
+        this.viewTrend = viewTrend;
     }
 }

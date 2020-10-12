@@ -14,5 +14,7 @@ public interface TagRepository extends CrudRepository<Tag, Long> {
 
 	Integer countAllByTagContains(String tag);
 
+	boolean existsByTag(String tag);
+
 	void deleteByTag(String tag);
 }
