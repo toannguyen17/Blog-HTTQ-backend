@@ -1,5 +1,6 @@
 package com.httq.services.userInfo;
 
+import com.httq.model.User;
 import com.httq.model.UserInfo;
 import com.httq.repository.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public Optional<UserInfo> getUser(Long id) {
         return userInfoRepository.findById(id);
+    }
+
+    @Override
+    public Optional<UserInfo> findByUser(User user) {
+        return userInfoRepository.findByUser(user);
     }
 }

@@ -1,7 +1,10 @@
 package com.httq.app.api.v1.userInfo;
 
 import com.httq.dto.BaseResponse;
+import com.httq.dto.user.UserResponseDTO;
+import com.httq.model.User;
 import com.httq.model.UserInfo;
+import com.httq.services.user.UserService;
 import com.httq.services.userInfo.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,10 @@ public class UserInfoController {
     @Autowired
     private UserInfoService userInfoService;
 
+
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/userInfo/{id}")
     public ResponseEntity<BaseResponse<UserInfo>> showUserInfo(@PathVariable("id") Long id) {
         BaseResponse<UserInfo> baseResponse = new BaseResponse<>();
@@ -31,21 +38,34 @@ public class UserInfoController {
     }
 
     @PutMapping("/updateProfile/{id}")
-    public ResponseEntity<BaseResponse<UserInfo>> updateUserInfo (@PathVariable("id") Long id, @RequestBody UserInfo userInfo) {
-        BaseResponse<UserInfo> baseResponse = new BaseResponse<>();
-        Optional<UserInfo> optionalUserInfo = userInfoService.findById(id);
-        if (!optionalUserInfo.isPresent()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<BaseResponse<UserResponseDTO>> updateUserInfo (@PathVariable("id") Long id, @RequestBody UserInfo userInfo) {
+        BaseResponse<UserResponseDTO> baseResponse = new BaseResponse<>();
+        UserResponseDTO userResponseDTO = null;
+
+        Optional<User> optionalUser = userService.findById(id);
+
+        if (optionalUser.isPresent()){
+            User user = optionalUser.get();
+            Optional<UserInfo> optionalUserInfo = userInfoService.findByUser(user);
+
+            UserInfo uInfo;
+            if (optionalUserInfo.isPresent()){
+                uInfo = optionalUserInfo.get();
+            }else {
+                uInfo = new UserInfo();
+                uInfo.setUser(user);
+            }
+
+            uInfo.setFirstName(userInfo.getFirstName());
+            uInfo.setLastName(userInfo.getLastName());
+            uInfo.setGender(userInfo.getGender());
+            uInfo.setPhone(userInfo.getPhone());
+            uInfo.setAddress(userInfo.getAddress());
+            userInfoService.save(uInfo);
+
+            userResponseDTO = userService.getInfo(user, uInfo);
         }
-
-        baseResponse.setData(optionalUserInfo.get());
-        userInfo.setFirstName(userInfo.getFirstName());
-        userInfo.setLastName(userInfo.getLastName());
-        userInfo.setPhone(userInfo.getPhone());
-        userInfo.setGender(userInfo.getGender());
-        userInfo.setAddress(userInfo.getAddress());
-
-        userInfoService.save(userInfo);
+        baseResponse.setData(userResponseDTO);
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 }

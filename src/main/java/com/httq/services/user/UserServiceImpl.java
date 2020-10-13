@@ -149,6 +149,7 @@ public class UserServiceImpl implements UserService {
 		return getInfo(user, null);
 	}
 
+
 	public UserResponseDTO getInfo(User user, UserInfo userInfo) {
 		UserResponseDTO userResponse = new UserResponseDTO();
 		userResponse.setId(user.getId());
