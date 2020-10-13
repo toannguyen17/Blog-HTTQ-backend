@@ -191,21 +191,4 @@ public class UserServiceImpl implements UserService {
         }
         throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
     }
-
-
-    public boolean changePassword(String email, String pw, String newPw) throws CustomException {
-        Optional<User> oUser = userRepository.findByEmail(email);
-        if (oUser.isPresent()) {
-            User user = oUser.get();
-            boolean check = passwordEncoder.matches(pw, user.getPassword());
-            if (check) {
-                user.setPassword(passwordEncoder.encode(newPw));
-                userRepository.save(user);
-                return true;
-            } else {
-                throw new CustomException("Password is incorrect.", HttpStatus.NOT_FOUND);
-            }
-        }
-        throw new CustomException("User does not exist.", HttpStatus.NOT_FOUND);
-    }
 }

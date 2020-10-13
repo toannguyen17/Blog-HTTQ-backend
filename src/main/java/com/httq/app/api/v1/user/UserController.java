@@ -4,10 +4,13 @@ package com.httq.app.api.v1.user;
 import com.httq.dto.BaseResponse;
 import com.httq.dto.user.ChangePWRequest;
 import com.httq.dto.user.UserResponseDTO;
+import com.httq.model.User;
 import com.httq.services.user.UserService;
+import com.httq.system.auth.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
     @Autowired
     private UserService userService;
+
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private Auth auth;
 
     @GetMapping(value = "me")
     public ResponseEntity<BaseResponse<UserResponseDTO>> getMyInfo(HttpServletRequest req) {
@@ -33,18 +43,20 @@ public class UserController {
     }
 
     @PutMapping("changePassword")
-    public ResponseEntity<BaseResponse<String>> changePassword(@RequestBody ChangePWRequest request) {
+    public ResponseEntity<BaseResponse<String>> changePassword(@RequestBody ChangePWRequest changePWRequest) {
         BaseResponse<String> response = new BaseResponse<>();
-        if (request.getNewPassword().equals(request.getConfirmNewPassword())){
-            if (userService.changePassword(request.getEmail(), request.getPassword(), request.getNewPassword())) {
+        User user = auth.user();
+        if (passwordEncoder.matches(user.getPassword(), changePWRequest.getPassword())) {
+            if (changePWRequest.getPassword().equals(changePWRequest.getNewPassword())) {
+            } else {
                 response.setMsg("Password changed.");
                 response.setData("OK");
-            } else {
-                response.setMsg("Failed");
-                response.setData("Failed");
+                user.setPassword(passwordEncoder.encode(changePWRequest.getPassword()));
+                userService.save(user);
             }
+        } else {
+            response.setMsg("Failed");
         }
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
