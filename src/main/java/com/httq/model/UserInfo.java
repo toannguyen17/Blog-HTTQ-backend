@@ -9,6 +9,10 @@ public class UserInfo {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@OneToOne
+	@JoinColumn(unique = true,name = "image_id",referencedColumnName = "id")
+	private Image avatar;
+
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
 
@@ -82,5 +86,13 @@ public class UserInfo {
 
 	public void setGender(String gender) {
 		this.gender = gender;
+	}
+
+	public Image getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(Image avatar) {
+		this.avatar = avatar;
 	}
 }

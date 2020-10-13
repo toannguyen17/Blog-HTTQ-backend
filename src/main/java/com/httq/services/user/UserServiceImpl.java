@@ -209,4 +209,5 @@ public class UserServiceImpl implements UserService {
         }
         throw new CustomException("User does not exist.", HttpStatus.NOT_FOUND);
     }
+
 }
