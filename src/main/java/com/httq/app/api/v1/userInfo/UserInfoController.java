@@ -5,7 +5,7 @@ import com.httq.dto.user.UserResponseDTO;
 import com.httq.model.User;
 import com.httq.model.UserInfo;
 import com.httq.services.user.UserService;
-import com.httq.services.userInfo.UserInfoService;
+import com.httq.services.userinfo.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

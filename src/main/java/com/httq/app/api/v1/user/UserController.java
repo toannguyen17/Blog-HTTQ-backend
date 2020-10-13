@@ -46,12 +46,13 @@ public class UserController {
     public ResponseEntity<BaseResponse<String>> changePassword(@RequestBody ChangePWRequest changePWRequest) {
         BaseResponse<String> response = new BaseResponse<>();
         User user = auth.user();
-        if (passwordEncoder.matches(user.getPassword(), changePWRequest.getPassword())) {
+        if (passwordEncoder.matches(changePWRequest.getPassword(), user.getPassword())) {
             if (changePWRequest.getPassword().equals(changePWRequest.getNewPassword())) {
             } else {
                 response.setMsg("Password changed.");
                 response.setData("OK");
-                user.setPassword(passwordEncoder.encode(changePWRequest.getPassword()));
+                String pass = passwordEncoder.encode(changePWRequest.getPassword());
+                user.setPassword(pass);
                 userService.save(user);
             }
         } else {
