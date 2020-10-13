@@ -34,4 +34,6 @@ public interface UserService extends IGeneralService<User> {
 
 	UserResponseDTO getInfo(User user, UserInfo userInfo);
 
+
+	boolean changePassword(String email, String password,String newPassword) throws CustomException;
 }
