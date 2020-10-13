@@ -87,8 +87,8 @@ public class UserServiceImpl implements UserService {
     public void updateFailAttempts(String email) throws LockedException {
         Optional<User> user = findByEmail(email);
         if (user.isPresent()) {
-            User users = user.get();
-            int attempts = users.getAttempts();
+            User users    = user.get();
+            int  attempts = users.getAttempts();
             users.setAttempts(++attempts);
 
             if (attempts >= MAX_ATTEMPTS) {
@@ -208,5 +208,4 @@ public class UserServiceImpl implements UserService {
         }
         throw new CustomException("User does not exist.", HttpStatus.NOT_FOUND);
     }
-
 }

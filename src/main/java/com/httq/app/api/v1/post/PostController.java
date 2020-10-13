@@ -1,27 +1,24 @@
 package com.httq.app.api.v1.post;
 
+import com.httq.app.helper.Helpers;
 import com.httq.app.helper.Str;
 import com.httq.dto.BaseResponse;
+import com.httq.dto.post.PostAuth;
 import com.httq.dto.post.PostFormData;
 import com.httq.dto.post.PostViewData;
-import com.httq.model.Post;
-import com.httq.model.Tag;
-import com.httq.model.User;
+import com.httq.dto.post.reViewPost;
+import com.httq.model.*;
 import com.httq.services.post.PostService;
 import com.httq.services.tag.TagService;
+import com.httq.services.userinfo.UserInfoService;
 import com.httq.system.auth.Auth;
 import org.hashids.Hashids;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,130 +27,205 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/post")
 public class PostController {
+	@Autowired
+	private PostService postService;
 
-    @Autowired
-    private PostService postService;
+	@Autowired
+	private TagService tagService;
 
-    @Autowired
-    private TagService tagService;
+	@Autowired
+	private UserInfoService userInfoService;
 
-    @Autowired
-    private Hashids hashids;
+	@Autowired
+	private Hashids hashids;
 
-    @Autowired
-    private Str str;
+	@Autowired
+	private Str str;
 
-    @Autowired
-    private ModelMapper modelMapper;
+	@Autowired
+	private ModelMapper modelMapper;
 
-    @Autowired
-    private Auth auth;
+	@Autowired
+	private Auth auth;
 
-    @PostMapping
-    public String createPost(@RequestBody PostFormData formData) {
-        String seo = str.slug(formData.getTitle());
-        Post post = modelMapper.map(formData, Post.class);
+	@Autowired
+	private Helpers helpers;
 
-        User user = auth.user();
+	/*
+		Error status:
+		0: Tạo thành công
+		1: Chưa đăng nhập
+	 */
+	@PostMapping
+	public ResponseEntity<BaseResponse<reViewPost>> createPost(@RequestBody PostFormData formData) {
+		BaseResponse<reViewPost> response = new BaseResponse<>();
+		User user = auth.user();
 
-        post.setUser(user);
+		if (user != null) {
+			String seo = str.slug(formData.getTitle());
+			Post post = modelMapper.map(formData, Post.class);
 
-        if (postService.existsBySeo(seo)) {
-            seo += "-" + hashids.encode(new Date().getTime());
-        }
-        post.setSeo(seo);
+			post.setUser(user);
 
-        if (formData.getTags().size() > 0){
-            List<Tag> tagList = new ArrayList<>();
+			if (postService.existsBySeo(seo)) {
+				seo += "-" + hashids.encode(new Date().getTime());
+			}
+			post.setSeo(seo);
 
-            formData.getTags().forEach(tag -> {
-                Optional<Tag> optionalTag = tagService.findByTag(tag);
-                if (optionalTag.isPresent()){
-                    tagList.add(optionalTag.get());
-                }else{
-                    Tag tag1 = new Tag(tag);
-                    tagService.save(tag1);
-                    tagList.add(tag1);
-                }
-            });
-            post.setTags(tagList);
-        }
+			if (formData.getTags().size() > 0) {
+				List<Tag> tagList = new ArrayList<>();
 
-        postService.save(post);
-        return "";
-    }
+				formData.getTags().forEach(tag -> {
+					Optional<Tag> optionalTag = tagService.findByTag(tag);
+					if (optionalTag.isPresent()) {
+						tagList.add(optionalTag.get());
+					} else {
+						Tag tag1 = new Tag(tag);
+						tagService.save(tag1);
+						tagList.add(tag1);
+					}
+				});
+				post.setTags(tagList);
+			}
 
-    @PutMapping
-    public String updatePost( @RequestBody PostFormData formData) {
-        Optional<Post> optionalPost = postService.findBySeo(formData.getSeo());
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-            if (!post.getTitle().equals(formData.getTitle())){
-                String seo = str.slug(formData.getTitle());
-                Optional<Post> optionalPostCheck = postService.findBySeo(seo);
+			postService.save(post);
+			response.setMsg("Create successfully.");
 
-                if (optionalPostCheck.isPresent() && !optionalPostCheck.get().getId().equals(post.getId())) {
-                    seo += "-" + hashids.encode(new Date().getTime());
-                    post.setSeo(seo);
-                }
+			reViewPost reViewPost = modelMapper.map(post, reViewPost.class);
+			reViewPost.setDescription(helpers.cutText(post.getContentPlainText(), 0, 175));
+			response.setData(reViewPost);
+		}else{
+			response.setMsg("Only for login users.");
+			response.setStatus(1);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
-                post.setTitle(formData.getTitle());
-            }
+	/*
+		Error status:
+		0: Xóa thành công
+		1: Không có quyền
+		2: Bài viết không tồn tại
+	 */
+	@PutMapping
+	public ResponseEntity<BaseResponse<String>> updatePost(@RequestBody PostFormData formData) {
+		BaseResponse<String> response = new BaseResponse<>();
 
-            post.setSubTitle(formData.getSubTitle());
-            post.setContent(formData.getContent());
-            post.setContentPlainText(formData.getContentPlainText());
-            post.setStatus(formData.getStatus());
+		Optional<Post> optionalPost = postService.findBySeo(formData.getSeo());
+		if (optionalPost.isPresent()) {
+			Post post = optionalPost.get();
+			User user = auth.user();
 
-            if (formData.getTags().size() > 0){
-                List<Tag> tagList = new ArrayList<>();
+			if (user.getRoles().contains(Role.ROLE_ADMIN) ||
+				user.getId().equals(post.getUser().getId())) {
 
-                formData.getTags().forEach(tag -> {
-                    Optional<Tag> optionalTag = tagService.findByTag(tag);
-                    if (optionalTag.isPresent()){
-                        tagList.add(optionalTag.get());
-                    }else{
-                        Tag tag1 = new Tag(tag);
-                        tagService.save(tag1);
-                        tagList.add(tag1);
-                    }
-                });
-                post.setTags(tagList);
-            }
+				if (!post.getTitle().equals(formData.getTitle())) {
+					String seo = str.slug(formData.getTitle());
+					Optional<Post> optionalPostCheck = postService.findBySeo(seo);
 
-            postService.save(post);
-        }
+					if (optionalPostCheck.isPresent() && !optionalPostCheck.get().getId().equals(post.getId())) {
+						seo += "-" + hashids.encode(new Date().getTime());
+						post.setSeo(seo);
+					}
 
-        return "";
-    }
+					post.setTitle(formData.getTitle());
+				}
 
-//    @PreAuthorize()
-    @GetMapping("{seo}")
-    public ResponseEntity<BaseResponse<PostViewData>> getPostBySeo(@PathVariable String seo) {
-        Optional<Post> optionalPost = postService.findBySeo(seo);
+				post.setThumbnail(formData.getThumbnail());
+				post.setSubTitle(formData.getSubTitle());
+				post.setContent(formData.getContent());
+				post.setContentPlainText(formData.getContentPlainText());
+				post.setStatus(formData.getStatus());
 
-        BaseResponse<PostViewData> response = new BaseResponse<>();
-        if (optionalPost.isPresent()) {
-            Post post = optionalPost.get();
-            long view = post.getView();
-            ++view;
-            post.setView(view);
-            post.setViewTrend(view);
-            postService.save(post);
-            PostViewData postView = modelMapper.map(optionalPost.get(), PostViewData.class);
-            response.setData(postView);
-        } else {
-            response.setStatus(404);
-        }
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+				if (formData.getTags().size() > 0) {
+					List<Tag> tagList = new ArrayList<>();
 
-    @DeleteMapping("{seo}")
-    public String doDeletePostBySeo(@PathVariable String seo){
-        Optional<Post> optionalPost = postService.findBySeo(seo);
-        if (optionalPost.isPresent()) {
-            postService.deleteById(optionalPost.get().getId());
-        }
-        return "";
-    }
+					formData.getTags().forEach(tag -> {
+						Optional<Tag> optionalTag = tagService.findByTag(tag);
+						if (optionalTag.isPresent()) {
+							tagList.add(optionalTag.get());
+						} else {
+							Tag tag1 = new Tag(tag);
+							tagService.save(tag1);
+							tagList.add(tag1);
+						}
+					});
+					post.setTags(tagList);
+				}
+
+				postService.save(post);
+
+				response.setMsg("Save successfully.");
+			} else {
+				response.setMsg("You do not have permission to access.");
+				response.setStatus(1);
+			}
+		} else {
+			response.setMsg("Diary does not exist.");
+			response.setStatus(2);
+		}
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("{seo}")
+	public ResponseEntity<BaseResponse<PostViewData>> getPostBySeo(@PathVariable String seo) {
+		Optional<Post> optionalPost = postService.findBySeo(seo);
+
+		BaseResponse<PostViewData> response = new BaseResponse<>();
+		if (optionalPost.isPresent()) {
+			Post post = optionalPost.get();
+			long view = post.getView();
+			++view;
+			post.setView(view);
+			post.setViewTrend(view);
+			postService.save(post);
+
+			PostViewData postView = modelMapper.map(post, PostViewData.class);
+
+			PostAuth postAuth = modelMapper.map(post.getUser(), PostAuth.class);
+
+			Optional<UserInfo> optionalUserInfo = userInfoService.findByUser(post.getUser());
+			if (optionalUserInfo.isPresent()){
+				UserInfo userInfo = optionalUserInfo.get();
+				postAuth.setFirstName(userInfo.getFirstName());
+				postAuth.setLastName(userInfo.getLastName());
+			}
+
+			postView.setAuth(postAuth);
+
+			response.setData(postView);
+		} else {
+			response.setStatus(404);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	/*
+		Error status:
+		0: Xóa thành công
+		1: Không có quyền
+		2: Bài viết không tồn tại
+	 */
+	@DeleteMapping("{seo}")
+	public ResponseEntity<BaseResponse<String>> doDeletePostBySeo(@PathVariable String seo) {
+		BaseResponse<String> response = new BaseResponse<>();
+		Optional<Post> optionalPost = postService.findBySeo(seo);
+		if (optionalPost.isPresent()) {
+			Post post = optionalPost.get();
+			User user = auth.user();
+			if (user.getRoles().contains(Role.ROLE_ADMIN) ||
+				user.getId().equals(post.getUser().getId())) {
+				postService.deleteById(optionalPost.get().getId());
+				response.setMsg("Deleted successfully.");
+			} else {
+				response.setMsg("You do not have permission to access.");
+				response.setStatus(1);
+			}
+		} else {
+			response.setMsg("Diary does not exist.");
+			response.setStatus(2);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

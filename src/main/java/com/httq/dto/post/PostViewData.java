@@ -1,8 +1,6 @@
 package com.httq.dto.post;
 
 import com.httq.model.Tag;
-import com.httq.model.User;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public class PostViewData {
         this.seo = seo;
     }
 
-    private User user;
+    private PostAuth auth;
 
     private String status;
 
@@ -70,14 +68,6 @@ public class PostViewData {
         this.content = content;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -108,5 +98,13 @@ public class PostViewData {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public PostAuth getAuth() {
+        return auth;
+    }
+
+    public void setAuth(PostAuth auth) {
+        this.auth = auth;
     }
 }
