@@ -32,16 +32,19 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("changepassword")
+    @PutMapping("changePassword")
     public ResponseEntity<BaseResponse<String>> changePassword(@RequestBody ChangePWRequest request) {
         BaseResponse<String> response = new BaseResponse<>();
-        if (userService.changePassword(request.getEmail(), request.getPassword(), request.getNewPassword())) {
-            response.setMsg("Password changed.");
-            response.setData("OK");
-        } else {
-            response.setMsg("Failed");
-            response.setData("Failed");
+        if (request.getNewPassword().equals(request.getConfirmNewPassword())){
+            if (userService.changePassword(request.getEmail(), request.getPassword(), request.getNewPassword())) {
+                response.setMsg("Password changed.");
+                response.setData("OK");
+            } else {
+                response.setMsg("Failed");
+                response.setData("Failed");
+            }
         }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

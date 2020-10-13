@@ -87,8 +87,8 @@ public class UserServiceImpl implements UserService {
     public void updateFailAttempts(String email) throws LockedException {
         Optional<User> user = findByEmail(email);
         if (user.isPresent()) {
-            User users    = user.get();
-            int  attempts = users.getAttempts();
+            User users = user.get();
+            int attempts = users.getAttempts();
             users.setAttempts(++attempts);
 
             if (attempts >= MAX_ATTEMPTS) {
@@ -173,14 +173,14 @@ public class UserServiceImpl implements UserService {
 
     public UserResponseDTO myInfo(HttpServletRequest req) {
         User user = userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)))
-                                  .get();
+                .get();
         return this.getInfo(user);
     }
 
     public UserResponseDTO getInfoById(Long id) {
         Optional<User> optionalUser = userRepository.findById(id);
         return optionalUser.map(this::getInfo)
-                           .orElse(null);
+                .orElse(null);
     }
 
     public String refresh(String email) throws CustomException {
@@ -193,15 +193,14 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     public boolean changePassword(String email, String pw, String newPw) throws CustomException {
         Optional<User> oUser = userRepository.findByEmail(email);
         if (oUser.isPresent()) {
-            User    u  = oUser.get();
-            boolean check = passwordEncoder.matches(pw, u.getPassword());
+            User user = oUser.get();
+            boolean check = passwordEncoder.matches(pw, user.getPassword());
             if (check) {
-                u.setPassword(passwordEncoder.encode(newPw));
-                userRepository.save(u);
+                user.setPassword(passwordEncoder.encode(newPw));
+                userRepository.save(user);
                 return true;
             } else {
                 throw new CustomException("Password is incorrect.", HttpStatus.NOT_FOUND);
