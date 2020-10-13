@@ -2,7 +2,9 @@ package com.httq.seeders;
 
 import com.httq.model.Role;
 import com.httq.model.User;
+import com.httq.model.UserInfo;
 import com.httq.services.user.UserService;
+import com.httq.services.userinfo.UserInfoService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class DatabaseSeeder {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private UserInfoService userInfoService;
 
 	public DatabaseSeeder() {
 	}
@@ -48,6 +53,15 @@ public class DatabaseSeeder {
 			user.setCredentialsNonExpired(true);
 
 			userService.save(user);
+
+			UserInfo userInfo = new UserInfo();
+			userInfo.setUser(user);
+			userInfo.setAddress("CodeGym");
+			userInfo.setFirstName("");
+			userInfo.setLastName("Admin");
+			userInfo.setGender("Nam");
+			userInfo.setPhone("+84123456789");
+			userInfoService.save(userInfo);
 		}
 	}
 }

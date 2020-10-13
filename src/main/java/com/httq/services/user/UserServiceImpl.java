@@ -192,8 +192,6 @@ public class UserServiceImpl implements UserService {
         throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
     }
 
-
-
     public boolean changePassword(String email, String pw, String newPw) throws CustomException {
         Optional<User> oUser = userRepository.findByEmail(email);
         if (oUser.isPresent()) {

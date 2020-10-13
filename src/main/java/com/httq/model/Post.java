@@ -56,6 +56,7 @@ public class Post {
     @ManyToMany
     @JoinTable(name = "post_tags", joinColumns = {@JoinColumn(name = "post_id",referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     @JsonIgnoreProperties
     private List<Tag> tags;
 
