@@ -10,7 +10,7 @@ import com.httq.dto.post.reViewPost;
 import com.httq.model.*;
 import com.httq.services.post.PostService;
 import com.httq.services.tag.TagService;
-import com.httq.services.userinfo.UserInfoService;
+import com.httq.services.userInfo.UserInfoService;
 import com.httq.system.auth.Auth;
 import org.hashids.Hashids;
 import org.modelmapper.ModelMapper;

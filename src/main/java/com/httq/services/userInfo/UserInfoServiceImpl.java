@@ -1,4 +1,4 @@
-package com.httq.services.userinfo;
+package com.httq.services.userInfo;
 
 import com.httq.model.User;
 import com.httq.model.UserInfo;
