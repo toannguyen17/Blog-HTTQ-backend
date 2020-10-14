@@ -12,6 +12,10 @@ import java.util.Random;
 public class Str {
 	static Map<String, String[]> _charsArray;
 
+	public Str(){
+		StaticUtils.setStr(this);
+	}
+
 	public String random(int length) {
 		StringBuilder string = new StringBuilder();
 		int len;
