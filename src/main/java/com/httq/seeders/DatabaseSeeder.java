@@ -4,7 +4,7 @@ import com.httq.model.Role;
 import com.httq.model.User;
 import com.httq.model.UserInfo;
 import com.httq.services.user.UserService;
-import com.httq.services.userinfo.UserInfoService;
+import com.httq.services.userInfo.UserInfoService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
