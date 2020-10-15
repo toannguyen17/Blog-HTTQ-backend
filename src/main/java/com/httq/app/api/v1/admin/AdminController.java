@@ -19,7 +19,7 @@ public class AdminController {
     @GetMapping("users")
     public ResponseEntity<BaseResponse<Iterable<UserDetailDTO>>> getAllUsers() {
         BaseResponse<Iterable<UserDetailDTO>> baseResponse = new BaseResponse<>();
-        Iterable<UserDetailDTO>               users        = adminService.findAllUser();
+        Iterable<UserDetailDTO> users = adminService.findAllUser();
 
         if (users.iterator().hasNext()) {
             baseResponse.setStatus(20);
@@ -31,6 +31,12 @@ public class AdminController {
         baseResponse.setData(users);
 
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("users/{id}")
+    public ResponseEntity<UserDetailDTO> findByID(@PathVariable("id") Long id) {
+        UserDetailDTO userDetailDTO = adminService.findById(id);
+        return new ResponseEntity<>(userDetailDTO, HttpStatus.OK);
     }
 
     //    @PreAuthorize("hasRole('ROLE_ADMIN')")
