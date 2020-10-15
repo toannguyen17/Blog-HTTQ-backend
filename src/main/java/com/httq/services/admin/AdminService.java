@@ -1,5 +1,6 @@
 package com.httq.services.admin;
 
+import com.httq.dto.report.ReportDTO;
 import com.httq.dto.user.UserDetailDTO;
 import com.httq.model.Tag;
 import com.httq.model.User;
@@ -24,5 +25,7 @@ public interface AdminService {
     Tag createTag(String tag);
     void deleteTag(String tag);
     void deleteTag(Tag tag);
+
+    ReportDTO getReport();
 
 }

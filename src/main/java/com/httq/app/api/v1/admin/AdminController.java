@@ -1,6 +1,7 @@
 package com.httq.app.api.v1.admin;
 
 import com.httq.dto.BaseResponse;
+import com.httq.dto.report.ReportDTO;
 import com.httq.dto.user.ChangePWRequest;
 import com.httq.dto.user.UserDetailDTO;
 import com.httq.model.Role;
@@ -213,6 +214,23 @@ public class AdminController {
             baseResponse.setData("Successfully.");
         } else {
             baseResponse.setData("Unsuccessfully.");
+            baseResponse.setMsg("Access denied.");
+            baseResponse.setStatus(43);
+        }
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("report")
+    public ResponseEntity<BaseResponse<ReportDTO>> getReport(){
+        BaseResponse<ReportDTO> baseResponse = new BaseResponse<>();
+        ReportDTO reportDTO;
+        if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
+            baseResponse.setStatus(20);
+            baseResponse.setMsg("Password was reset.");
+            reportDTO = adminService.getReport();
+            baseResponse.setData(reportDTO);
+        } else {
+            baseResponse.setData(null);
             baseResponse.setMsg("Access denied.");
             baseResponse.setStatus(43);
         }

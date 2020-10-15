@@ -1,10 +1,9 @@
 package com.httq.services.admin;
 
+import com.httq.dto.report.ReportDTO;
 import com.httq.dto.user.UserDetailDTO;
-import com.httq.model.Role;
-import com.httq.model.Tag;
-import com.httq.model.User;
-import com.httq.model.UserInfo;
+import com.httq.model.*;
+import com.httq.repository.PostRepository;
 import com.httq.repository.TagRepository;
 import com.httq.repository.UserInfoRepository;
 import com.httq.repository.UsersRepository;
@@ -12,8 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,14 +21,17 @@ import java.util.Optional;
 @Service
 public class AdminServiceImpl implements AdminService {
     @Autowired
-    private UsersRepository usersRepository;
+    private UsersRepository    usersRepository;
     @Autowired
     private UserInfoRepository userInfoRepository;
     @Autowired
-    private TagRepository tagRepository;
+    private TagRepository      tagRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -38,11 +40,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<UserDetailDTO> findAllUser() {
-        Iterable<User> users = usersRepository.findAll();
-        List<UserDetailDTO> list = new ArrayList<>();
+        Iterable<User>      users = usersRepository.findAll();
+        List<UserDetailDTO> list  = new ArrayList<>();
         for (User u : users) {
             Optional<UserInfo> ui = userInfoRepository.findByUser(u);
-            UserDetailDTO ud = new UserDetailDTO();
+            UserDetailDTO      ud = new UserDetailDTO();
             ud.setId(u.getId());
             ud.setRoles(u.getRoles());
             ud.setAccountNonExpired(u.isAccountNonExpired());
@@ -71,11 +73,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public UserDetailDTO findById(Long id) {
         Optional<User> user = usersRepository.findById(id);
-        if (user.isPresent()){
-            User u = user.get();
-            UserDetailDTO ud = modelMapper.map(u, UserDetailDTO.class);
+        if (user.isPresent()) {
+            User               u  = user.get();
+            UserDetailDTO      ud = modelMapper.map(u, UserDetailDTO.class);
             Optional<UserInfo> ui = userInfoRepository.findById(id);
-            if (ui.isPresent()){
+            if (ui.isPresent()) {
                 UserInfo userInfo = ui.get();
                 ud.setFirstName(userInfo.getFirstName());
                 ud.setLastName(userInfo.getLastName());
@@ -86,7 +88,7 @@ public class AdminServiceImpl implements AdminService {
             }
             return ud;
         }
-            return null;
+        return null;
     }
 
     @Override
@@ -174,7 +176,7 @@ public class AdminServiceImpl implements AdminService {
         Optional<User> u = usersRepository.findById(id);
         if (u.isPresent()) {
             UserDetailDTO userDetailDTO = new UserDetailDTO();
-            User user = u.get();
+            User          user          = u.get();
             userDetailDTO.setId(user.getId());
             setUser(userDetailDTO, user);
 
@@ -229,5 +231,26 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void deleteTag(Tag tag) {
 
+    }
+
+    @Override
+    public ReportDTO getReport() {
+        LocalDateTime  last7Days              = LocalDateTime.now().minusDays(7L);
+        LocalDateTime  last30Days             = LocalDateTime.now().minusDays(30L);
+        int            numberOfPostLast7Days  = 0;
+        int            numberOfPostLast30Days = 0;
+        Iterable<Post> posts                  = postRepository.findAll();
+        for (Post p : posts) {
+            if (p.getCreatedAt().isAfter(last7Days)) {
+                numberOfPostLast7Days++;
+            }
+            if (p.getCreatedAt().isAfter(last30Days)) {
+                numberOfPostLast30Days++;
+            }
+        }
+        ReportDTO reportDTO = new ReportDTO();
+        reportDTO.setNumberOfPostLast7Days(numberOfPostLast7Days);
+        reportDTO.setNumberOfPostLast30Days(numberOfPostLast30Days);
+        return reportDTO;
     }
 }
