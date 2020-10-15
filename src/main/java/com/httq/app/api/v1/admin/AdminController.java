@@ -156,7 +156,7 @@ public class AdminController {
     }
 
     @DeleteMapping("users/{id}")
-    public ResponseEntity<BaseResponse<UserDetailDTO>> deleteUser(@RequestParam("id") Long id) {
+    public ResponseEntity<BaseResponse<UserDetailDTO>> deleteUser(@PathVariable("id") Long id) {
         BaseResponse<UserDetailDTO> baseResponse = new BaseResponse<>();
         if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
             adminService.deleteUserById(id);

@@ -1,6 +1,8 @@
 package com.httq.model;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -42,6 +44,7 @@ public class User {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "role_user", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
+//	@OnDelete(action = OnDeleteAction.CASCADE)
 	private List<Role> roles;
 
 	public User() {

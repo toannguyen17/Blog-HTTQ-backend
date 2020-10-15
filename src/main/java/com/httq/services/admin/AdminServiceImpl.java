@@ -93,7 +93,7 @@ public class AdminServiceImpl implements AdminService {
     public void deleteUserById(Long id) {
         Optional<User> user = usersRepository.findById(id);
         if (user.isPresent()) {
-            userInfoRepository.deleteByUser(user.get());
+            userInfoRepository.deleteById(id);
             usersRepository.deleteById(id);
         }
     }
