@@ -1,10 +1,13 @@
 package com.httq.dto.post;
 
+import com.httq.model.PostStatusList;
+
 import java.time.LocalDateTime;
 
 public class reViewPost {
     private String thumbnail;
     private String title;
+    private PostStatusList status;
     private String seo;
     private String description;
     private LocalDateTime createdAt;
@@ -49,5 +52,13 @@ public class reViewPost {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public PostStatusList getStatus() {
+        return status;
+    }
+
+    public void setStatus(PostStatusList status) {
+        this.status = status;
     }
 }

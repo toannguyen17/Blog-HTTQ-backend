@@ -5,6 +5,7 @@ import com.httq.dto.BaseResponse;
 import com.httq.dto.post.reViewPost;
 import com.httq.dto.home.HomeResponse;
 import com.httq.model.Post;
+import com.httq.model.PostStatusList;
 import com.httq.services.post.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class HomeController {
         HomeResponse homeResponse = new HomeResponse();
 
         // Trending
-        Iterable<Post> topTrending = postService.findTop21Trending();
+        Iterable<Post> topTrending = postService.findTopTrending(21);
         List<reViewPost> homeTopTrend = new ArrayList<>();
 
         homeResponse.setTopTrend(homeTopTrend);
@@ -47,7 +48,7 @@ public class HomeController {
         });
 
         //Last Post
-        Iterable<Post> lastPost = postService.lastPost();
+        Iterable<Post> lastPost = postService.lastPost(PostStatusList.PUBLIC);
         List<reViewPost> homeLastPostList = new ArrayList<>();
 
         homeResponse.setLastPost(homeLastPostList);
