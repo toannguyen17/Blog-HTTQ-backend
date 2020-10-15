@@ -8,9 +8,11 @@ import com.httq.model.UserInfo;
 import com.httq.repository.TagRepository;
 import com.httq.repository.UserInfoRepository;
 import com.httq.repository.UsersRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,24 +22,27 @@ import java.util.Optional;
 @Service
 public class AdminServiceImpl implements AdminService {
     @Autowired
-    private UsersRepository    usersRepository;
+    private UsersRepository usersRepository;
     @Autowired
     private UserInfoRepository userInfoRepository;
     @Autowired
-    private TagRepository      tagRepository;
+    private TagRepository tagRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     private final String DEFAULT_PASSWORD = "123456";
 
     @Override
     public List<UserDetailDTO> findAllUser() {
-        Iterable<User>      users = usersRepository.findAll();
-        List<UserDetailDTO> list  = new ArrayList<>();
+        Iterable<User> users = usersRepository.findAll();
+        List<UserDetailDTO> list = new ArrayList<>();
         for (User u : users) {
             Optional<UserInfo> ui = userInfoRepository.findByUser(u);
-            UserDetailDTO      ud = new UserDetailDTO();
+            UserDetailDTO ud = new UserDetailDTO();
             ud.setId(u.getId());
             ud.setRoles(u.getRoles());
             ud.setAccountNonExpired(u.isAccountNonExpired());
@@ -61,6 +66,27 @@ public class AdminServiceImpl implements AdminService {
         }
 
         return list;
+    }
+
+    @Override
+    public UserDetailDTO findById(Long id) {
+        Optional<User> user = usersRepository.findById(id);
+        if (user.isPresent()){
+            User u = user.get();
+            UserDetailDTO ud = modelMapper.map(u, UserDetailDTO.class);
+            Optional<UserInfo> ui = userInfoRepository.findById(id);
+            if (ui.isPresent()){
+                UserInfo userInfo = ui.get();
+                ud.setFirstName(userInfo.getFirstName());
+                ud.setLastName(userInfo.getLastName());
+                ud.setGender(userInfo.getGender());
+                ud.setPhone(userInfo.getPhone());
+                ud.setAddress(userInfo.getAddress());
+                ud.setAvatar(userInfo.getAvatar());
+            }
+            return ud;
+        }
+            return null;
     }
 
     @Override
@@ -91,25 +117,6 @@ public class AdminServiceImpl implements AdminService {
         UserInfo userInfo = new UserInfo();
         setUserInfo(userDetailDTO, user, userInfo);
         userInfoRepository.save(userInfo);
-        return userDetailDTO;
-    }
-
-    @Override
-    public UserDetailDTO updateUser(UserDetailDTO userDetailDTO) {
-        Optional<User> u = usersRepository.findById(userDetailDTO.getId());
-        if (u.isPresent()) {
-            User user = u.get();
-            setUser(userDetailDTO, user);
-            usersRepository.save(user);
-
-            Optional<UserInfo> ui = userInfoRepository.findByUser(user);
-            UserInfo           userInfo;
-
-            userInfo = ui.orElseGet(UserInfo::new);
-            setUserInfo(userDetailDTO, user, userInfo);
-            userInfoRepository.save(userInfo);
-        }
-
         return userDetailDTO;
     }
 
@@ -167,7 +174,7 @@ public class AdminServiceImpl implements AdminService {
         Optional<User> u = usersRepository.findById(id);
         if (u.isPresent()) {
             UserDetailDTO userDetailDTO = new UserDetailDTO();
-            User          user          = u.get();
+            User user = u.get();
             userDetailDTO.setId(user.getId());
             setUser(userDetailDTO, user);
 
