@@ -1,6 +1,7 @@
 package com.httq.app.api.v1.admin;
 
 import com.httq.dto.BaseResponse;
+import com.httq.dto.user.ChangePWRequest;
 import com.httq.dto.user.UserDetailDTO;
 import com.httq.model.Role;
 import com.httq.services.admin.AdminService;
@@ -44,7 +45,7 @@ public class AdminController {
     }
 
     @GetMapping("users/{id}")
-    public ResponseEntity<BaseResponse<UserDetailDTO>> getUser(@PathVariable("id")Long id) {
+    public ResponseEntity<BaseResponse<UserDetailDTO>> getUser(@PathVariable("id") Long id) {
         BaseResponse<UserDetailDTO> baseResponse = new BaseResponse<>();
         if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
             UserDetailDTO userDetailDTO = adminService.findUserById(id);
@@ -97,12 +98,12 @@ public class AdminController {
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping("users")
-    public ResponseEntity<BaseResponse<UserDetailDTO>> deleteUser(@RequestBody UserDetailDTO userDetailDTO) {
+    @DeleteMapping("users/{id}")
+    public ResponseEntity<BaseResponse<UserDetailDTO>> deleteUser(@RequestParam("id") Long id) {
         BaseResponse<UserDetailDTO> baseResponse = new BaseResponse<>();
         if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
-            adminService.deleteUser(userDetailDTO);
-            baseResponse.setData(userDetailDTO);
+            adminService.deleteUserById(id);
+            baseResponse.setData(null);
             baseResponse.setMsg("User was deleted.");
             baseResponse.setStatus(20);
         } else {
@@ -125,6 +126,38 @@ public class AdminController {
             baseResponse.setMsg("Access denied.");
             baseResponse.setStatus(43);
             baseResponse.setData(null);
+        }
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("unblock-user")
+    public ResponseEntity<BaseResponse<UserDetailDTO>> unblockUser(@RequestBody UserDetailDTO userDetailDTO) {
+        BaseResponse<UserDetailDTO> baseResponse = new BaseResponse<>();
+        if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
+            adminService.unblockUser(userDetailDTO);
+            baseResponse.setData(userDetailDTO);
+            baseResponse.setMsg("User was unblocked.");
+            baseResponse.setStatus(20);
+        } else {
+            baseResponse.setMsg("Access denied.");
+            baseResponse.setStatus(43);
+            baseResponse.setData(null);
+        }
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("resetpw")
+    public ResponseEntity<BaseResponse<String>> changePassword(@RequestBody Long id) {
+        BaseResponse<String> baseResponse = new BaseResponse<>();
+        if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
+            adminService.resetPassword(id);
+            baseResponse.setStatus(20);
+            baseResponse.setMsg("Password was reset.");
+            baseResponse.setData("Successfully.");
+        } else {
+            baseResponse.setData("Unsuccessfully.");
+            baseResponse.setMsg("Access denied.");
+            baseResponse.setStatus(43);
         }
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }

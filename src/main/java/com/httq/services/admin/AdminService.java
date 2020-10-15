@@ -14,7 +14,9 @@ public interface AdminService {
     UserDetailDTO updateUser(UserDetailDTO userDetailDTO);
     Iterable<UserDetailDTO> searchUserByAny(String key);
     UserDetailDTO blockUser(UserDetailDTO userDetailDTO);
+    UserDetailDTO unblockUser(UserDetailDTO userDetailDTO);
     UserDetailDTO findUserById(Long id);
+    String resetPassword(Long id);
 
     Iterable<Tag> findAllTags();
     Iterable<Tag> findAllTagsContains(String key);

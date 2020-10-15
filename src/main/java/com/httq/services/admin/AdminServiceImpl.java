@@ -146,6 +146,18 @@ public class AdminServiceImpl implements AdminService {
         if (u.isPresent()) {
             User user = u.get();
             user.setEnabled(false);
+            usersRepository.save(user);
+        }
+        return userDetailDTO;
+    }
+
+    @Override
+    public UserDetailDTO unblockUser(UserDetailDTO userDetailDTO) {
+        Optional<User> u = usersRepository.findById(userDetailDTO.getId());
+        if (u.isPresent()) {
+            User user = u.get();
+            user.setEnabled(true);
+            usersRepository.save(user);
         }
         return userDetailDTO;
     }
@@ -169,6 +181,17 @@ public class AdminServiceImpl implements AdminService {
             return userDetailDTO;
         }
         return null;
+    }
+
+    @Override
+    public String resetPassword(Long id) {
+        Optional<User> u = usersRepository.findById(id);
+        if (u.isPresent()) {
+            User user = u.get();
+            user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
+            usersRepository.save(user);
+        }
+        return "OK";
     }
 
     @Override
