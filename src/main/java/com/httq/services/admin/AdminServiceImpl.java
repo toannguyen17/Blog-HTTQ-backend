@@ -87,9 +87,10 @@ public class AdminServiceImpl implements AdminService {
     public UserDetailDTO createUser(UserDetailDTO userDetailDTO) {
         User user = new User();
         setUser(userDetailDTO, user);
-
+        usersRepository.save(user);
         UserInfo userInfo = new UserInfo();
         setUserInfo(userDetailDTO, user, userInfo);
+        userInfoRepository.save(userInfo);
         return userDetailDTO;
     }
 
@@ -99,12 +100,13 @@ public class AdminServiceImpl implements AdminService {
         if (u.isPresent()) {
             User user = u.get();
             setUser(userDetailDTO, user);
+            usersRepository.save(user);
 
             Optional<UserInfo> ui = userInfoRepository.findByUser(user);
             UserInfo           userInfo;
-
             userInfo = ui.orElseGet(UserInfo::new);
             setUserInfo(userDetailDTO, user, userInfo);
+            userInfoRepository.save(userInfo);
         }
 
         return userDetailDTO;
@@ -117,7 +119,7 @@ public class AdminServiceImpl implements AdminService {
         user.setAccountNonLocked(userDetailDTO.isAccountNonLocked());
         user.setAccountNonExpired(userDetailDTO.isAccountNonExpired());
         user.setCredentialsNonExpired(userDetailDTO.isCredentialsNonExpired());
-        usersRepository.save(user);
+
     }
 
     private void setUserInfo(UserDetailDTO userDetailDTO, User user, UserInfo userInfo) {
@@ -129,11 +131,42 @@ public class AdminServiceImpl implements AdminService {
         userInfo.setGender(userDetailDTO.getGender());
         userInfo.setPhone(userDetailDTO.getPhone());
         userInfo.setUser(user);
-        userInfoRepository.save(userInfo);
+
     }
 
     @Override
     public Iterable<UserDetailDTO> searchUserByAny(String key) {
+        return null;
+    }
+
+    @Override
+    public UserDetailDTO blockUser(UserDetailDTO userDetailDTO) {
+        Optional<User> u = usersRepository.findById(userDetailDTO.getId());
+        if (u.isPresent()) {
+            User user = u.get();
+            user.setEnabled(false);
+        }
+        return userDetailDTO;
+    }
+
+    @Override
+    public UserDetailDTO findUserById(Long id) {
+        Optional<User> u = usersRepository.findById(id);
+        if (u.isPresent()) {
+            UserDetailDTO userDetailDTO = new UserDetailDTO();
+            User          user          = u.get();
+            userDetailDTO.setId(user.getId());
+            setUser(userDetailDTO, user);
+
+            Optional<UserInfo> ui = userInfoRepository.findByUser(user);
+            if (ui.isPresent()) {
+                UserInfo userInfo = ui.get();
+                setUserInfo(userDetailDTO, user, userInfo);
+            } else {
+                setUserInfo(userDetailDTO, user, new UserInfo());
+            }
+            return userDetailDTO;
+        }
         return null;
     }
 

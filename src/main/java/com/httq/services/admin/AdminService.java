@@ -13,6 +13,8 @@ public interface AdminService {
     UserDetailDTO createUser(UserDetailDTO userDetailDTO);
     UserDetailDTO updateUser(UserDetailDTO userDetailDTO);
     Iterable<UserDetailDTO> searchUserByAny(String key);
+    UserDetailDTO blockUser(UserDetailDTO userDetailDTO);
+    UserDetailDTO findUserById(Long id);
 
     Iterable<Tag> findAllTags();
     Iterable<Tag> findAllTagsContains(String key);
