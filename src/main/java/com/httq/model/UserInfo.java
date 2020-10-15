@@ -21,11 +21,7 @@ public class UserInfo {
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
 
-
 	@OneToOne(fetch = FetchType.EAGER)
-
-	@OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
-
 	@JoinColumn(unique = true, name = "userId", referencedColumnName = "id", nullable = false)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;

@@ -2,21 +2,16 @@ package com.httq.app.api.v1.admin;
 
 import com.httq.dto.BaseResponse;
 import com.httq.dto.user.UserDetailDTO;
-
+import com.httq.model.Role;
 import com.httq.model.User;
 import com.httq.model.UserInfo;
 import com.httq.services.admin.AdminService;
 import com.httq.services.user.UserService;
 import com.httq.services.userInfo.UserInfoService;
-
-import com.httq.model.Role;
-import com.httq.services.admin.AdminService;
 import com.httq.system.auth.Auth;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
