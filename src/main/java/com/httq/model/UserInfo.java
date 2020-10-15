@@ -1,8 +1,6 @@
 package com.httq.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -15,7 +13,6 @@ public class UserInfo {
 
 	@OneToOne
 	@JoinColumn(unique = true,name = "image_id",referencedColumnName = "id")
-	@OnDelete(action = OnDeleteAction.NO_ACTION)
 	private Image avatar;
 
 	@Column(name = "last_name", nullable = false)
@@ -24,9 +21,12 @@ public class UserInfo {
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
 
+<<<<<<< HEAD
 	@OneToOne(fetch = FetchType.EAGER)
+=======
+	@OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+>>>>>>> ba55f981745559cbffa441e318ea012b3654e02f
 	@JoinColumn(unique = true, name = "userId", referencedColumnName = "id", nullable = false)
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 
@@ -37,10 +37,6 @@ public class UserInfo {
 	private String address;
 
 	public UserInfo() {
-	}
-
-	public UserInfo(User user) {
-		this.user = user;
 	}
 
 	public Long getId() {

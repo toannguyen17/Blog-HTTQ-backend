@@ -1,5 +1,4 @@
 # Main
-app-url                                   = ${APP_URL:http://localhost}
 spring.application.name                   = ${APP_NAME:MrT}
 debug                                     = ${APP_DEBUG:false}
 trace                                     = ${APP_TRACE:false}
@@ -14,10 +13,8 @@ spring.datasource.password                = ${DB_PASSWORD:}
 spring.jpa.properties.hibernate.dialect   = org.hibernate.dialect.MySQL5InnoDBDialect
 spring.jpa.hibernate.ddl-auto             = update
 
-spring.resources.static-locations         = classpath:/public/,file:storage
+spring.resources.static-locations         = classpath:/public/,file:upload
 
 # File upload
 spring.servlet.multipart.max-file-size    = 10MB
 spring.servlet.multipart.max-request-size = 10MB
-
-upload_storage                            = storage

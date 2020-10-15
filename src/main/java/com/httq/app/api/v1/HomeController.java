@@ -35,7 +35,7 @@ public class HomeController {
         HomeResponse homeResponse = new HomeResponse();
 
         // Trending
-        Iterable<Post> topTrending = postService.findTopTrending(21);
+        Iterable<Post> topTrending = postService.findTop21Trending();
         List<reViewPost> homeTopTrend = new ArrayList<>();
 
         homeResponse.setTopTrend(homeTopTrend);

@@ -8,9 +8,7 @@ public class UserResponseDTO {
 
 	private Long id;
 
-	private String email;
-
-	private String avatar;
+	private String  email;
 
 	private String lastName;
 
@@ -86,13 +84,5 @@ public class UserResponseDTO {
 
 	public void setGender(String gender) {
 		this.gender = gender;
-	}
-
-	public String getAvatar() {
-		return avatar;
-	}
-
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
 	}
 }

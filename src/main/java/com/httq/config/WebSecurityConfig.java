@@ -40,11 +40,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public Hashids hashidsAvatar() {
-		return new Hashids("Avatar", 6, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
-	}
-
-	@Bean
 	public JwtTokenFilter jwtTokenFilter() {
 		return new JwtTokenFilter(jwtTokenProvider);
 	}
@@ -103,11 +98,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+//		http.authorizeRequests()
+//				    .antMatchers("/**")
+//				    .permitAll();
+
 		// Entry points
 		http.authorizeRequests()
 			.antMatchers("/api/v1/home")
-			.permitAll()
-			.antMatchers("/images/**")
 			.permitAll()
 			.antMatchers("/api/v1/user/me")
 			.permitAll()
@@ -124,7 +121,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// Apply JWT
 		http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
 
-		http.headers().cacheControl();
+//		http.httpBasic();
 	}
 
 	@Bean

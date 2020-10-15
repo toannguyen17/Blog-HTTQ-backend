@@ -15,10 +15,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, name = "name")
-    private String name;
-
-    private String format;
+    private String fileName;
 
     private String path;
 
@@ -38,10 +35,6 @@ public class Image {
     public Image(){
     }
 
-    public Image(User user){
-        this.user = user;
-    }
-
     public Long getId() {
         return id;
     }
@@ -50,20 +43,12 @@ public class Image {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFormat() {
-        return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getPath() {
