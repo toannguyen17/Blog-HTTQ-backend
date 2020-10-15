@@ -1,8 +1,12 @@
 package com.httq.services.post;
 
 import com.httq.model.Post;
+import com.httq.model.PostStatusList;
+import com.httq.model.User;
 import com.httq.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -47,17 +51,27 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public Iterable<Post> lastPost() {
-		return postRepository.findTop8ByOrderByIdDesc();
+	public Iterable<Post> lastPost(PostStatusList status) {
+		return postRepository.findTop8ByStatusOrderByIdDesc(status);
 	}
 
 	@Override
-	public Iterable<Post> findTop10Trending() {
-		return postRepository.findTop10Trending();
+	public Iterable<Post> findTopTrending(Integer status, Integer limit) {
+		return postRepository.findTopTrending(status, limit);
 	}
 
 	@Override
 	public Iterable<Post> findTop21Trending() {
 		return postRepository.findTop21Trending();
+	}
+
+	@Override
+	public Page<Post> searchByUser(User user, Pageable pageable) {
+		return postRepository.findAllByUser(user, pageable);
+	}
+
+	@Override
+	public Page<Post> searchByUserAndKey(User user, String key, Pageable pageable) {
+		return postRepository.findAllByUserAndContentPlainTextContainsOrTitleContainsOrSubTitleContains(user, key, key, key, pageable);
 	}
 }

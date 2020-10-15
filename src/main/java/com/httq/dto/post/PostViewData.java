@@ -1,5 +1,6 @@
 package com.httq.dto.post;
 
+import com.httq.model.PostStatusList;
 import com.httq.model.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +26,7 @@ public class PostViewData {
 
     private PostAuth auth;
 
-    private String status;
+    private PostStatusList status;
 
     private LocalDateTime createdAt;
 
@@ -92,11 +93,11 @@ public class PostViewData {
         this.tags = tags;
     }
 
-    public String getStatus() {
+    public PostStatusList getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PostStatusList status) {
         this.status = status;
     }
 

@@ -1,11 +1,11 @@
 package com.httq.services.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.httq.config.JwtTokenProvider;
 import com.httq.dto.AuthResponse;
 import com.httq.dto.user.UserRegisterForm;
 import com.httq.dto.user.UserResponseDTO;
 import com.httq.exception.CustomException;
+import com.httq.model.Image;
 import com.httq.model.Role;
 import com.httq.model.User;
 import com.httq.model.UserInfo;
@@ -13,6 +13,7 @@ import com.httq.repository.UserInfoRepository;
 import com.httq.repository.UsersRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.LockedException;
@@ -27,168 +28,175 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private static final int MAX_ATTEMPTS = 6;
+	private static final int MAX_ATTEMPTS = 6;
 
-    @Autowired
-    private UsersRepository userRepository;
+	@Autowired
+	private Environment environment;
 
-    @Autowired
-    private UserInfoRepository userInfoRepository;
+	@Autowired
+	private UsersRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private UserInfoRepository userInfoRepository;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    public ModelMapper modelMapper;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    @Override
-    public Iterable<User> findAll() {
-        return userRepository.findAll();
-    }
+	@Autowired
+	public ModelMapper modelMapper;
 
-    @Override
-    public void save(User users) {
-        userRepository.save(users);
-    }
+	@Override
+	public Iterable<User> findAll() {
+		return userRepository.findAll();
+	}
 
-    @Override
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
+	@Override
+	public void save(User users) {
+		userRepository.save(users);
+	}
 
-    @Override
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
+	@Override
+	public Optional<User> findById(Long id) {
+		return userRepository.findById(id);
+	}
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+	@Override
+	public void deleteById(Long id) {
+		userRepository.deleteById(id);
+	}
 
-    @Override
-    public void resetFailAttempts(String email) {
-        Optional<User> user = findByEmail(email);
-        if (user.isPresent()) {
-            User users = user.get();
-            users.setAttempts(0);
-            users.setAccountNonLocked(true);
-            save(users);
-        }
-    }
+	@Override
+	public Optional<User> findByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
 
-    @Override
-    public void updateFailAttempts(String email) throws LockedException {
-        Optional<User> user = findByEmail(email);
-        if (user.isPresent()) {
-            User users    = user.get();
-            int  attempts = users.getAttempts();
-            users.setAttempts(++attempts);
+	@Override
+	public void resetFailAttempts(String email) {
+		Optional<User> user = findByEmail(email);
+		if (user.isPresent()) {
+			User users = user.get();
+			users.setAttempts(0);
+			users.setAccountNonLocked(true);
+			save(users);
+		}
+	}
 
-            if (attempts >= MAX_ATTEMPTS) {
-                users.setAccountNonLocked(false);
-            }
+	@Override
+	public void updateFailAttempts(String email) throws LockedException {
+		Optional<User> user = findByEmail(email);
+		if (user.isPresent()) {
+			User users = user.get();
+			int attempts = users.getAttempts();
+			users.setAttempts(++attempts);
 
-            save(users);
+			if (attempts >= MAX_ATTEMPTS) {
+				users.setAccountNonLocked(false);
+			}
 
-            if (attempts >= MAX_ATTEMPTS) {
-                throw new LockedException("User Account is locked!");
-            }
-        }
-    }
+			save(users);
 
-    public AuthResponse authenticate(String email, String password) throws CustomException {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            Optional<User> optionalUser = userRepository.findByEmail(email);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                return new AuthResponse(getInfo(user), jwtTokenProvider.createToken(email, user.getRoles()));
-            }
-        } catch (AuthenticationException ignored) {
-        }
-        throw new CustomException("Invalid email/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
+			if (attempts >= MAX_ATTEMPTS) {
+				throw new LockedException("User Account is locked!");
+			}
+		}
+	}
 
-    public AuthResponse signup(UserRegisterForm form) throws CustomException {
-        if (!userRepository.existsByEmail(form.getEmail())) {
-            User user = modelMapper.map(form, User.class);
-            user.setPassword(passwordEncoder.encode(form.getPassword()));
-            user.setRoles(Collections.singletonList(Role.ROLE_USER));
-            user.setEnabled(true);
-            user.setAccountNonLocked(true);
-            user.setAccountNonExpired(true);
-            user.setCredentialsNonExpired(true);
-            userRepository.save(user);
+	public AuthResponse authenticate(String email, String password) throws CustomException {
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+			Optional<User> optionalUser = userRepository.findByEmail(email);
+			if (optionalUser.isPresent()) {
+				User user = optionalUser.get();
+				return new AuthResponse(getInfo(user), jwtTokenProvider.createToken(email, user.getRoles()));
+			}
+		} catch (AuthenticationException ignored) {
+		}
+		throw new CustomException("Invalid email/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
+	}
 
-            UserInfo userInfo = modelMapper.map(form, UserInfo.class);
-            userInfo.setUser(user);
-            userInfoRepository.save(userInfo);
+	public AuthResponse signup(UserRegisterForm form) throws CustomException {
+		if (!userRepository.existsByEmail(form.getEmail())) {
+			User user = modelMapper.map(form, User.class);
+			user.setPassword(passwordEncoder.encode(form.getPassword()));
+			user.setRoles(Collections.singletonList(Role.ROLE_USER));
+			user.setEnabled(true);
+			user.setAccountNonLocked(true);
+			user.setAccountNonExpired(true);
+			user.setCredentialsNonExpired(true);
+			userRepository.save(user);
 
-            return new AuthResponse(getInfo(user, userInfo), jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
-        } else {
-            throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-    }
+			UserInfo userInfo = modelMapper.map(form, UserInfo.class);
+			userInfo.setUser(user);
+			userInfoRepository.save(userInfo);
 
-    public User search(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (!user.isPresent()) {
-            throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
-        }
-        return user.get();
-    }
+			return new AuthResponse(getInfo(user, userInfo), jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
+		} else {
+			throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
 
-    public UserResponseDTO getInfo(User user) {
-        return getInfo(user, null);
-    }
+	public User search(String email) {
+		Optional<User> user = userRepository.findByEmail(email);
+		if (!user.isPresent()) {
+			throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
+		}
+		return user.get();
+	}
 
-    public UserResponseDTO getInfo(User user, UserInfo userInfo) {
-        UserResponseDTO userResponse = new UserResponseDTO();
-        userResponse.setId(user.getId());
-        userResponse.setEmail(user.getEmail());
-        userResponse.setRoles(user.getRoles());
+	public UserResponseDTO getInfo(User user) {
+		return getInfo(user, null);
+	}
 
-        if (userInfo == null) {
-            Optional<UserInfo> optionalUserInfo = userInfoRepository.findByUser(user);
-            userInfo = optionalUserInfo.orElse(null);
-        }
+	public UserResponseDTO getInfo(User user, UserInfo userInfo) {
+		UserResponseDTO userResponse = new UserResponseDTO();
+		userResponse.setId(user.getId());
+		userResponse.setEmail(user.getEmail());
+		userResponse.setRoles(user.getRoles());
 
-        if (userInfo != null) {
-            userResponse.setLastName(userInfo.getLastName());
-            userResponse.setFirstName(userInfo.getFirstName());
-            userResponse.setAddress(userInfo.getAddress());
-            userResponse.setGender(userInfo.getGender());
-            userResponse.setPhone(userInfo.getPhone());
-        }
+		if (userInfo == null) {
+			Optional<UserInfo> optionalUserInfo = userInfoRepository.findByUser(user);
+			userInfo = optionalUserInfo.orElse(null);
+		}
 
-        return userResponse;
-    }
+		if (userInfo != null) {
+			if (userInfo.getAvatar() != null) {
+				Image image = userInfo.getAvatar();
+				userResponse.setAvatar(environment.getProperty("app-url") + "/images/" + image.getName() + "." + image.getFormat());
+			}
+			userResponse.setLastName(userInfo.getLastName());
+			userResponse.setFirstName(userInfo.getFirstName());
+			userResponse.setAddress(userInfo.getAddress());
+			userResponse.setGender(userInfo.getGender());
+			userResponse.setPhone(userInfo.getPhone());
+		}
 
-    public UserResponseDTO myInfo(HttpServletRequest req) {
-        User user = userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)))
-                .get();
-        return this.getInfo(user);
-    }
+		return userResponse;
+	}
 
-    public UserResponseDTO getInfoById(Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        return optionalUser.map(this::getInfo)
-                .orElse(null);
-    }
+	public UserResponseDTO myInfo(HttpServletRequest req) {
+		User user = userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)))
+			.get();
+		return this.getInfo(user);
+	}
 
-    public String refresh(String email) throws CustomException {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            return jwtTokenProvider.createToken(email, user.getRoles());
-        }
-        throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
-    }
+	public UserResponseDTO getInfoById(Long id) {
+		Optional<User> optionalUser = userRepository.findById(id);
+		return optionalUser.map(this::getInfo)
+			.orElse(null);
+	}
+
+	public String refresh(String email) throws CustomException {
+		Optional<User> optionalUser = userRepository.findByEmail(email);
+		if (optionalUser.isPresent()) {
+			User user = optionalUser.get();
+			return jwtTokenProvider.createToken(email, user.getRoles());
+		}
+		throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
+	}
 }
