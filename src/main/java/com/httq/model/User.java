@@ -1,9 +1,7 @@
 package com.httq.model;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -43,8 +41,10 @@ public class User {
 	private boolean accountNonLocked;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "role_user", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
-//	@OnDelete(action = OnDeleteAction.CASCADE)
+	@CollectionTable(name = "role_user", joinColumns = {@JoinColumn(name = "user_id")})
+	@JoinColumn(name = "user_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@Cascade(value = CascadeType.ALL)
 	private List<Role> roles;
 
 	public User() {
