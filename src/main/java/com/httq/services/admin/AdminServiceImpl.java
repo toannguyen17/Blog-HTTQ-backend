@@ -204,6 +204,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public boolean isExistedEmail(String email) {
+        return usersRepository.existsByEmail(email);
+    }
+
+    @Override
     public Iterable<Tag> findAllTags() {
         return tagRepository.findAll();
     }

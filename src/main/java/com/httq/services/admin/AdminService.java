@@ -18,6 +18,7 @@ public interface AdminService {
     UserDetailDTO unblockUser(UserDetailDTO userDetailDTO);
     UserDetailDTO findUserById(Long id);
     String resetPassword(Long id);
+    boolean isExistedEmail(String email);
 
     Iterable<Tag> findAllTags();
     Iterable<Tag> findAllTagsContains(String key);

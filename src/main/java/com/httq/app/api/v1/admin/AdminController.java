@@ -105,10 +105,16 @@ public class AdminController {
     public ResponseEntity<BaseResponse<UserDetailDTO>> createUser(@RequestBody UserDetailDTO userDetailDTO) {
         BaseResponse<UserDetailDTO> baseResponse = new BaseResponse<>();
         if (auth.user().getRoles().contains(Role.ROLE_ADMIN)) {
-            adminService.createUser(userDetailDTO);
-            baseResponse.setData(userDetailDTO);
-            baseResponse.setStatus(20);
-            baseResponse.setMsg("User was created.");
+            if (adminService.isExistedEmail(userDetailDTO.getEmail())){
+                baseResponse.setData(null);
+                baseResponse.setStatus(51);
+                baseResponse.setMsg("Email was used. User was not created.");
+            }else {
+                adminService.createUser(userDetailDTO);
+                baseResponse.setData(userDetailDTO);
+                baseResponse.setStatus(20);
+                baseResponse.setMsg("User was created.");
+            }
         } else {
             baseResponse.setMsg("Access denied.");
             baseResponse.setStatus(43);
