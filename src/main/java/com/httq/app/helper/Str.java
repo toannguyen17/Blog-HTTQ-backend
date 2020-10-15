@@ -50,15 +50,15 @@ public class Str {
 		for (Entry entry: charsArray().entrySet()) {
 			string = str_replace(string, (String[]) entry.getValue(), (String)entry.getKey());
 		}
-		return value.replaceAll("[^\\x20-\\x7E]", "");
+		return string;
 	}
 
 	private String str_replace(String value, String[] val, String key) {
 		String string = value;
 		for (String search: val){
-			string = string.replace(search, key);
+			string = string.replaceAll(search, key);
 		}
-		return string;
+		return string.trim();
 	}
 
 	public String slug(String title){
@@ -78,7 +78,7 @@ public class Str {
 		String result = ascii(title);
 
 		// Convert all dashes/underscores into separator
-		String flip = separator == "-" ? "_" : "-";
+		String flip = separator.equals("-") ? "_" : "-";
 
 		result = result.replaceAll("[" + flip + "]+", separator);
 
@@ -93,7 +93,7 @@ public class Str {
 		// Replace all separator characters and whitespace by a single separator
 		result = result.replaceAll("[" + separator + "\\s]+", separator);
 
-		return result.trim();
+		return result;
 	}
 
 	public Map<String, String[]> charsArray() {

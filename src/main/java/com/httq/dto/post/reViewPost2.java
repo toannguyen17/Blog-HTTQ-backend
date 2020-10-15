@@ -1,12 +1,17 @@
 package com.httq.dto.post;
 
 import com.httq.app.helper.StaticUtils;
+import com.httq.model.PostStatusList;
+
 import java.time.LocalDateTime;
 
 public class reViewPost2 {
 	private String thumbnail;
 	private String title;
 	private String seo;
+
+	private PostStatusList status;
+
 	private String contentPlainText;
 	private LocalDateTime createdAt;
 
@@ -51,5 +56,13 @@ public class reViewPost2 {
 
 	public void setContentPlainText(String contentPlainText) {
 		this.contentPlainText = StaticUtils.getHelpers().cutText(contentPlainText, 0, 175);
+	}
+
+	public PostStatusList getStatus() {
+		return status;
+	}
+
+	public void setStatus(PostStatusList status) {
+		this.status = status;
 	}
 }

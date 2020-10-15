@@ -1,6 +1,5 @@
 package com.httq.app.api.v1.profile;
 
-
 import com.httq.dto.BaseResponse;
 import com.httq.dto.post.PostFindByUser;
 import com.httq.dto.post.PostPageProfile;
@@ -34,7 +33,7 @@ public class ProfileController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	private Integer size = 1;
+	private Integer size = 10;
 
 	@PostMapping("search")
 	public ResponseEntity<BaseResponse<PostPageProfile>> search(@RequestBody PostFindByUser search) {

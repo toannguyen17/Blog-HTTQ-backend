@@ -15,6 +15,7 @@ import com.httq.system.auth.Auth;
 import org.hashids.Hashids;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/post")
 public class PostController {
+
+	@Autowired
+	private Environment environment;
+
 	@Autowired
 	private PostService postService;
 
@@ -94,7 +99,7 @@ public class PostController {
 			reViewPost reViewPost = modelMapper.map(post, reViewPost.class);
 			reViewPost.setDescription(helpers.cutText(post.getContentPlainText(), 0, 175));
 			response.setData(reViewPost);
-		}else{
+		} else {
 			response.setMsg("Only for login users.");
 			response.setStatus(1);
 		}
@@ -108,8 +113,8 @@ public class PostController {
 		2: Bài viết không tồn tại
 	 */
 	@PutMapping
-	public ResponseEntity<BaseResponse<String>> updatePost(@RequestBody PostFormData formData) {
-		BaseResponse<String> response = new BaseResponse<>();
+	public ResponseEntity<BaseResponse<reViewPost>> updatePost(@RequestBody PostFormData formData) {
+		BaseResponse<reViewPost> response = new BaseResponse<>();
 
 		Optional<Post> optionalPost = postService.findBySeo(formData.getSeo());
 		if (optionalPost.isPresent()) {
@@ -155,7 +160,10 @@ public class PostController {
 
 				postService.save(post);
 
-				response.setMsg("Save successfully.");
+				response.setMsg("Update successfully.");
+				reViewPost reViewPost = modelMapper.map(post, reViewPost.class);
+				reViewPost.setDescription(helpers.cutText(post.getContentPlainText(), 0, 175));
+				response.setData(reViewPost);
 			} else {
 				response.setMsg("You do not have permission to access.");
 				response.setStatus(1);
@@ -172,29 +180,37 @@ public class PostController {
 	public ResponseEntity<BaseResponse<PostViewData>> getPostBySeo(@PathVariable String seo) {
 		Optional<Post> optionalPost = postService.findBySeo(seo);
 
+		User user = auth.user();
+
 		BaseResponse<PostViewData> response = new BaseResponse<>();
 		if (optionalPost.isPresent()) {
 			Post post = optionalPost.get();
-			long view = post.getView();
-			++view;
-			post.setView(view);
-			post.setViewTrend(view);
-			postService.save(post);
+			if ((user != null && user.getRoles().contains(Role.ROLE_ADMIN)) ||
+				post.getStatus() != PostStatusList.PRIVATE
+			) {
+				long view = post.getView();
+				++view;
+				post.setView(view);
+				post.setViewTrend(view);
+				postService.save(post);
+				PostViewData postView = modelMapper.map(post, PostViewData.class);
+				PostAuth postAuth = modelMapper.map(post.getUser(), PostAuth.class);
 
-			PostViewData postView = modelMapper.map(post, PostViewData.class);
-
-			PostAuth postAuth = modelMapper.map(post.getUser(), PostAuth.class);
-
-			Optional<UserInfo> optionalUserInfo = userInfoService.findByUser(post.getUser());
-			if (optionalUserInfo.isPresent()){
-				UserInfo userInfo = optionalUserInfo.get();
-				postAuth.setFirstName(userInfo.getFirstName());
-				postAuth.setLastName(userInfo.getLastName());
+				Optional<UserInfo> optionalUserInfo = userInfoService.findByUser(post.getUser());
+				if (optionalUserInfo.isPresent()) {
+					UserInfo userInfo = optionalUserInfo.get();
+					postAuth.setFirstName(userInfo.getFirstName());
+					postAuth.setLastName(userInfo.getLastName());
+					if (userInfo.getAvatar() != null){
+						Image image = userInfo.getAvatar();
+						postAuth.setThumbnail(environment.getProperty("app-url") + "/images/" + image.getName() + "." + image.getFormat());
+					}
+				}
+				postView.setAuth(postAuth);
+				response.setData(postView);
+			}else{
+				response.setStatus(403);
 			}
-
-			postView.setAuth(postAuth);
-
-			response.setData(postView);
 		} else {
 			response.setStatus(404);
 		}

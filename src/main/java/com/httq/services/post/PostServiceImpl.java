@@ -1,6 +1,7 @@
 package com.httq.services.post;
 
 import com.httq.model.Post;
+import com.httq.model.PostStatusList;
 import com.httq.model.User;
 import com.httq.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +51,13 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public Iterable<Post> lastPost() {
-		return postRepository.findTop8ByOrderByIdDesc();
+	public Iterable<Post> lastPost(PostStatusList status) {
+		return postRepository.findTop8ByStatusOrderByIdDesc(status);
 	}
 
 	@Override
-	public Iterable<Post> findTopTrending(Integer limit) {
-		return postRepository.findTopTrending(limit);
+	public Iterable<Post> findTopTrending(Integer status, Integer limit) {
+		return postRepository.findTopTrending(status, limit);
 	}
 
 	@Override
@@ -71,6 +72,6 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public Page<Post> searchByUserAndKey(User user, String key, Pageable pageable) {
-		return postRepository.findAllByUserAndContentPlainTextContains(user, key, pageable);
+		return postRepository.findAllByUserAndContentPlainTextContainsOrTitleContainsOrSubTitleContains(user, key, key, key, pageable);
 	}
 }

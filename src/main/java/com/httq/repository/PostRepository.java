@@ -1,6 +1,7 @@
 package com.httq.repository;
 
 import com.httq.model.Post;
+import com.httq.model.PostStatusList;
 import com.httq.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,14 +19,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Optional<Post> findBySeo(String seo);
 
 	Iterable<Post> findTop8ByOrderByIdDesc();
+	Iterable<Post> findTop8ByStatusOrderByIdDesc(PostStatusList status);
 
-	@Query(value = "select * from posts order by (view_trend / (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(created_at))) desc limit :limit", nativeQuery = true)
-	Iterable<Post> findTopTrending(@Param("limit") Integer limit);
+	@Query(value = "select * from posts where `status` = :status order by (view_trend / (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(created_at))) desc limit :limit", nativeQuery = true)
+	Iterable<Post> findTopTrending(@Param("status") Integer status, @Param("limit") Integer limit);
 
 	@Query(value = "select * from posts order by (view_trend / (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(created_at))) desc limit 21", nativeQuery = true)
 	Iterable<Post> findTop21Trending();
 
 	Page<Post> findAllByUser(User user, Pageable pageable);
 
-	Page<Post> findAllByUserAndContentPlainTextContains(User user, String key, Pageable pageable);
+	Page<Post> findAllByUserAndContentPlainTextContainsOrTitleContainsOrSubTitleContains(User user, String key1, String key2, String key3, Pageable pageable);
 }

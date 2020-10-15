@@ -38,6 +38,7 @@ public class AuthController {
 		BaseResponse<AuthResponse> response = new BaseResponse<>();
 		try {
 			response.setData(userService.signup(form));
+			response.setMsg("Sign Up Success.");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (CustomException customException) {
 			response.setMsg(customException.getMessage());
