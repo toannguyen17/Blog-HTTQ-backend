@@ -24,7 +24,7 @@ public class UserInfo {
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
 
-	@OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(unique = true, name = "userId", referencedColumnName = "id", nullable = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
