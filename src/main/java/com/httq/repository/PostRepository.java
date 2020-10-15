@@ -1,6 +1,7 @@
 package com.httq.repository;
 
 import com.httq.model.Post;
+import com.httq.model.PostStatusList;
 import com.httq.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

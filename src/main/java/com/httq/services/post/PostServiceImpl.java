@@ -51,8 +51,8 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public Iterable<Post> lastPost() {
-		return postRepository.findTop8ByOrderByIdDesc();
+	public Iterable<Post> lastPost(PostStatusList status) {
+		return postRepository.findTop8ByStatusOrderByIdDesc(status);
 	}
 
 	@Override

@@ -57,7 +57,7 @@ public class DatabaseSeeder {
 			UserInfo userInfo = new UserInfo();
 			userInfo.setUser(user);
 			userInfo.setAddress("CodeGym");
-			userInfo.setFirstName("");
+			userInfo.setFirstName("Hi");
 			userInfo.setLastName("Admin");
 			userInfo.setGender("Nam");
 			userInfo.setPhone("+84123456789");
