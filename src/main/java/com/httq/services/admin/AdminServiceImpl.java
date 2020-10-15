@@ -104,6 +104,7 @@ public class AdminServiceImpl implements AdminService {
 
             Optional<UserInfo> ui = userInfoRepository.findByUser(user);
             UserInfo           userInfo;
+
             userInfo = ui.orElseGet(UserInfo::new);
             setUserInfo(userDetailDTO, user, userInfo);
             userInfoRepository.save(userInfo);
