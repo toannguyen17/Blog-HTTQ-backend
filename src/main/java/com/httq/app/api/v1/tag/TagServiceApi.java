@@ -1,13 +1,23 @@
 package com.httq.app.api.v1.tag;
 
 import com.httq.dto.BaseResponse;
+import com.httq.dto.post.PostPageProfile;
+import com.httq.model.Post;
 import com.httq.model.Tag;
+import com.httq.services.post.PostService;
 import com.httq.services.tag.TagService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 //Status:
@@ -21,6 +31,43 @@ import java.util.Optional;
 public class TagServiceApi {
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private PostService postService;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<PostPageProfile>> getAllTags(@RequestParam("t") List<String> t, @RequestParam("page") Optional<Integer> page) {
+        BaseResponse<PostPageProfile> response = new BaseResponse<>();
+        List<Tag> tags = new ArrayList<>();
+        t.forEach(tag -> {
+            Optional<Tag> optionalTag = tagService.findByTag(tag);
+            if (optionalTag.isPresent()){
+                tags.add(optionalTag.get());
+            }
+        });
+
+        Integer size = 10;
+
+        Pageable pageable;
+        Integer page_s = page.orElse(null);
+        if (page_s == null || page_s < 1){
+            pageable = PageRequest.of(0, size, Sort.by("id").descending());
+
+        }else{
+            --page_s;
+            pageable = PageRequest.of(page_s, size, Sort.by("id").descending());
+        }
+
+        Page<Post> postPage = postService.findAllByTagsIn(tags, pageable);
+
+        PostPageProfile postPageProfile = modelMapper.map(postPage, PostPageProfile.class);
+
+        response.setData(postPageProfile);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("all")
     public ResponseEntity<BaseResponse<Iterable<Tag>>> getAllTags() {

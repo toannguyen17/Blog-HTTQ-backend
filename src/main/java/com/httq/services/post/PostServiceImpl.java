@@ -2,6 +2,7 @@ package com.httq.services.post;
 
 import com.httq.model.Post;
 import com.httq.model.PostStatusList;
+import com.httq.model.Tag;
 import com.httq.model.User;
 import com.httq.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -68,6 +70,10 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public Page<Post> searchByUser(User user, Pageable pageable) {
 		return postRepository.findAllByUser(user, pageable);
+	}
+
+	public Page<Post> findAllByTagsIn(List<Tag> tags, Pageable pageable) {
+		return postRepository.findAllByTagsIn(tags, pageable);
 	}
 
 	@Override

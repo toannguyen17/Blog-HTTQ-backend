@@ -124,6 +124,7 @@ public class AdminServiceImpl implements AdminService {
 
     private void setUser(UserDetailDTO userDetailDTO, User user) {
         user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
+        user.setEmail(userDetailDTO.getEmail());
         user.setRoles(Collections.singletonList(Role.ROLE_USER));
         user.setEnabled(userDetailDTO.isEnabled());
         user.setAccountNonLocked(userDetailDTO.isAccountNonLocked());
