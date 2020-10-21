@@ -77,8 +77,7 @@ public class UserController {
 		BaseResponse<String> response = new BaseResponse<>();
 		User user = auth.user();
 		if (passwordEncoder.matches(changePWRequest.getPassword(), user.getPassword())) {
-			if (changePWRequest.getPassword().equals(changePWRequest.getNewPassword())) {
-			} else {
+			if (!changePWRequest.getPassword().equals(changePWRequest.getNewPassword())) {
 				response.setMsg("Password changed.");
 				response.setData("OK");
 				String pass = passwordEncoder.encode(changePWRequest.getNewPassword());
@@ -87,6 +86,7 @@ public class UserController {
 			}
 		} else {
 			response.setMsg("Failed");
+			response.setStatus(1);
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
