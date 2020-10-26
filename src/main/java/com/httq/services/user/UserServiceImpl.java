@@ -1,10 +1,19 @@
 package com.httq.services.user;
 
 import com.httq.config.JwtTokenProvider;
+import com.httq.dto.AuthResponse;
+import com.httq.dto.user.UserRegisterForm;
+import com.httq.dto.user.UserResponseDTO;
 import com.httq.exception.CustomException;
+import com.httq.model.Image;
+import com.httq.model.Role;
 import com.httq.model.User;
+import com.httq.model.UserInfo;
+import com.httq.repository.UserInfoRepository;
 import com.httq.repository.UsersRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.LockedException;
@@ -14,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -21,7 +31,13 @@ public class UserServiceImpl implements UserService {
 	private static final int MAX_ATTEMPTS = 6;
 
 	@Autowired
+	private Environment environment;
+
+	@Autowired
 	private UsersRepository userRepository;
+
+	@Autowired
+	private UserInfoRepository userInfoRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -32,6 +48,8 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	public ModelMapper modelMapper;
 
 	@Override
 	public Iterable<User> findAll() {
@@ -73,8 +91,8 @@ public class UserServiceImpl implements UserService {
 	public void updateFailAttempts(String email) throws LockedException {
 		Optional<User> user = findByEmail(email);
 		if (user.isPresent()) {
-			User users    = user.get();
-			int  attempts = users.getAttempts();
+			User users = user.get();
+			int attempts = users.getAttempts();
 			users.setAttempts(++attempts);
 
 			if (attempts >= MAX_ATTEMPTS) {
@@ -89,32 +107,39 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	public String signin(String email, String password) {
+	public AuthResponse authenticate(String email, String password) throws CustomException {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 			Optional<User> optionalUser = userRepository.findByEmail(email);
 			if (optionalUser.isPresent()) {
 				User user = optionalUser.get();
-				return jwtTokenProvider.createToken(email, user.getRoles());
+				return new AuthResponse(getInfo(user), jwtTokenProvider.createToken(email, user.getRoles()));
 			}
 		} catch (AuthenticationException ignored) {
 		}
 		throw new CustomException("Invalid email/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-	public String signup(User user) {
-		if (!userRepository.existsByEmail(user.getEmail())) {
-			user.setPassword(passwordEncoder.encode(user.getPassword()));
+	public AuthResponse signup(UserRegisterForm form) throws CustomException {
+		if (!userRepository.existsByEmail(form.getEmail())) {
+			User user = modelMapper.map(form, User.class);
+			user.setPassword(passwordEncoder.encode(form.getPassword()));
+			user.setRoles(Collections.singletonList(Role.ROLE_USER));
+			user.setEnabled(true);
+			user.setAccountNonLocked(true);
+			user.setAccountNonExpired(true);
+			user.setCredentialsNonExpired(true);
 			userRepository.save(user);
-			return jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
+
+			UserInfo userInfo = modelMapper.map(form, UserInfo.class);
+			userInfo.setUser(user);
+			userInfoRepository.save(userInfo);
+
+			return new AuthResponse(getInfo(user, userInfo), jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
 		} else {
 			throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
-
-//	public void delete(String email) {
-//		userRepository.deleteByUsername(email);
-//	}
 
 	public User search(String email) {
 		Optional<User> user = userRepository.findByEmail(email);
@@ -124,11 +149,49 @@ public class UserServiceImpl implements UserService {
 		return user.get();
 	}
 
-	public User whoami(HttpServletRequest req) {
-		return userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req))).get();
+	public UserResponseDTO getInfo(User user) {
+		return getInfo(user, null);
 	}
 
-	public String refresh(String email) {
+	public UserResponseDTO getInfo(User user, UserInfo userInfo) {
+		UserResponseDTO userResponse = new UserResponseDTO();
+		userResponse.setId(user.getId());
+		userResponse.setEmail(user.getEmail());
+		userResponse.setRoles(user.getRoles());
+
+		if (userInfo == null) {
+			Optional<UserInfo> optionalUserInfo = userInfoRepository.findByUser(user);
+			userInfo = optionalUserInfo.orElse(null);
+		}
+
+		if (userInfo != null) {
+			if (userInfo.getAvatar() != null) {
+				Image image = userInfo.getAvatar();
+				userResponse.setAvatar(environment.getProperty("app-url") + "/images/" + image.getName() + "." + image.getFormat());
+			}
+			userResponse.setLastName(userInfo.getLastName());
+			userResponse.setFirstName(userInfo.getFirstName());
+			userResponse.setAddress(userInfo.getAddress());
+			userResponse.setGender(userInfo.getGender());
+			userResponse.setPhone(userInfo.getPhone());
+		}
+
+		return userResponse;
+	}
+
+	public UserResponseDTO myInfo(HttpServletRequest req) {
+		User user = userRepository.findByEmail(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)))
+			.get();
+		return this.getInfo(user);
+	}
+
+	public UserResponseDTO getInfoById(Long id) {
+		Optional<User> optionalUser = userRepository.findById(id);
+		return optionalUser.map(this::getInfo)
+			.orElse(null);
+	}
+
+	public String refresh(String email) throws CustomException {
 		Optional<User> optionalUser = userRepository.findByEmail(email);
 		if (optionalUser.isPresent()) {
 			User user = optionalUser.get();

@@ -1,54 +1,109 @@
 package com.httq.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
-@Table(name="UserInfos")
+@Table(name = "user_info")
 public class UserInfo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    @OneToOne(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId",referencedColumnName = "id",nullable = false)
-    private User user;
+	@OneToOne
+	@JoinColumn(unique = true,name = "image_id",referencedColumnName = "id")
+	@OnDelete(action = OnDeleteAction.NO_ACTION)
+	private Image avatar;
 
-    private String phone;
+	@Column(name = "last_name", nullable = false)
+	private String lastName;
 
-    private String address;
+	@Column(name = "first_name", nullable = false)
+	private String firstName;
 
-    public UserInfo() {
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(unique = true, name = "userId", referencedColumnName = "id", nullable = false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private User user;
+
+	private String phone;
+
+	private String gender;
+
+	private String address;
+
+	public UserInfo() {
+	}
+
+	public UserInfo(User user) {
+		this.user = user;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+    public String getLastName() {
+        return lastName;
     }
 
-    public Long getId() {
-        return id;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public User getUser() {
-        return user;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public String getGender() {
+		return gender;
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	public Image getAvatar() {
+		return avatar;
+	}
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
+	public void setAvatar(Image avatar) {
+		this.avatar = avatar;
+	}
 }

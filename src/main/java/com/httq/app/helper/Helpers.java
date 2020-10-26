@@ -4,7 +4,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Helpers {
-    public Helpers(){}
+    public Helpers(){
+        StaticUtils.setHelpers(this);
+    }
 
     public String cutText(String text, int begin, int end) {
         if (text == null)

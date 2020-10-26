@@ -1,9 +1,11 @@
 package com.httq.model;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,12 +23,6 @@ public class User {
 
 	@Column(nullable = false)
 	private String password;
-
-	@Column(name = "last_name", nullable = false)
-	private String lastName;
-
-	@Column(name = "first_name", nullable = false)
-	private String firstName;
 
 	private int attempts;
 
@@ -47,7 +43,10 @@ public class User {
 	private boolean accountNonLocked;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "role_user", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
+	@CollectionTable(name = "role_user", joinColumns = {@JoinColumn(name = "user_id")})
+	@JoinColumn(name = "user_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@Cascade(value = CascadeType.ALL)
 	private List<Role> roles;
 
 	public User() {
@@ -75,22 +74,6 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
 	}
 
 	public LocalDateTime getCreatedAt() {
